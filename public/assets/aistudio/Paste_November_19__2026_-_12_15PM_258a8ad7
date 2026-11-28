@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITTC Center — Practical Test & Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #060a12;
+      --bg-sidebar: #090e18;
+      --bg-surface: #0c1320;
+      --bg-surface-soft: #10192b;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --accent: #10b981;
+      --accent-dark: #059669;
+      --accent-soft: rgba(16, 185, 129, 0.14);
+      --accent-glow: rgba(16, 185, 129, 0.28);
+      --amber: #f59e0b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-display: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      --font-body: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      --font-scale: 1;
+    }
+
+    body.theme-navy {
+      --accent: #eab308;
+      --accent-dark: #ca8a04;
+      --accent-soft: rgba(234, 179, 8, 0.15);
+      --accent-glow: rgba(234, 179, 8, 0.28);
+    }
+
+    body.theme-flame {
+      --accent: #f97316;
+      --accent-dark: #ea580c;
+      --accent-soft: rgba(249, 115, 22, 0.15);
+      --accent-glow: rgba(249, 115, 22, 0.28);
+    }
+
+    body.no-animations *,
+    body.no-animations *::before,
+    body.no-animations *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: calc(16px * var(--font-scale));
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 18% 8%, var(--accent-soft), transparent 36%),
+        radial-gradient(circle at 88% 22%, rgba(59, 130, 246, 0.06), transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Keyframes */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 var(--accent-glow); }
+      50% { transform: scale(1.2); box-shadow: 0 0 0 6px transparent; }
+    }
+
+    @keyframes ringRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .reveal {
+      opacity: 0;
+      animation: fadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* APP SHELL */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 235px 1fr;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 6px;
+    }
+
+    /* Shared Round Logo Sync */
+    .synced-round-logo {
+      position: relative;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #062823;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 16px var(--accent-soft);
+    }
+
+    .synced-round-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .synced-round-logo .logo-fallback {
+      font-family: var(--font-display);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .sidebar-brand .synced-round-logo {
+      width: 38px;
+      height: 38px;
+    }
+
+    .sidebar-brand .logo-fallback {
+      font-size: 12px;
+    }
+
+    .sidebar-brand-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .sidebar-brand-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 4px 10px 2px;
+      font-weight: 600;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 11px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #f1f5f9;
+    }
+
+    .nav-item.active {
+      background: var(--accent);
+      color: #042019;
+      font-weight: 700;
+    }
+
+    .nav-item.settings-trigger {
+      margin-top: 4px;
+      border-color: rgba(148, 163, 184, 0.22);
+      background: rgba(16, 185, 129, 0.08);
+      color: #e2e8f0;
+    }
+
+    .nav-item.settings-trigger:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: #ffffff;
+    }
+
+    .nav-pill-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.15);
+      color: #cbd5e1;
+    }
+
+    /* MAIN CONTENT */
+    .main-area {
+      padding: 14px 20px 32px;
+    }
+
+    /* Top utility bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left h2 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .topbar-left p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-surface);
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    .clock-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: right;
+      line-height: 1.25;
+      padding: 0 4px;
+    }
+
+    .top-action-btn {
+      background: var(--bg-surface-soft);
+      border: 1px solid var(--border-subtle);
+      color: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .top-action-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .top-action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #042019;
+      font-weight: 700;
+    }
+
+    /* HERO BANNER (Clean: no Upload/Reset buttons here) */
+    .hero-banner {
+      position: relative;
+      background: linear-gradient(120deg, rgba(16, 185, 129, 0.18) 0%, rgba(12, 19, 32, 0.96) 55%, rgba(9, 14, 24, 0.98) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      border-radius: 15px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-logo-frame {
+      position: relative;
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-ring {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(255, 255, 255, 0.45);
+      animation: ringRotate 24s linear infinite;
+      pointer-events: none;
+    }
+
+    .hero-logo-frame .synced-round-logo {
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+    }
+
+    .hero-logo-frame .logo-fallback {
+      font-size: 13px;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #6ee7b7;
+      margin-bottom: 3px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulseDot 2s infinite;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .hero-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9px;
+      padding: 9px 15px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-emerald {
+      background: var(--accent);
+      color: #042019;
+      box-shadow: 0 8px 20px -8px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 13px;
+      padding: 14px 15px;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .kpi-card.emerald { border-color: rgba(16, 185, 129, 0.3); }
+    .kpi-card.amber { border-color: rgba(245, 158, 11, 0.38); }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kpi-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 19px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* MIDDLE SECTION */
+    .middle-grid {
+      display: grid;
+      grid-template-columns: 1.85fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .panel-head h3 {
+      font-family: var(--font-display);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .panel-head p {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .panel-link {
+      color: var(--accent);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .cat-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cat-chip {
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-chip:hover { transform: translateY(-2px); color: #ffffff; }
+
+    .cat-chip.active {
+      background: var(--accent-soft);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+    }
+
+    .cat-chip .num {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 10.5px;
+    }
+
+    .cat-chip.active .num {
+      background: var(--accent);
+      color: #042019;
+      font-weight: 800;
+    }
+
+    .quick-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .quick-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.65);
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .quick-card:hover { transform: translateX(3px); }
+    .quick-card.emerald { border-color: rgba(16, 185, 129, 0.35); background: rgba(16, 185, 129, 0.08); }
+    .quick-card.amber { border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.08); }
+
+    .quick-card-title { font-size: 12.5px; font-weight: 700; color: #ffffff; }
+    .quick-card-sub { font-size: 11px; color: var(--text-secondary); }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    td {
+      padding: 11px 12px;
+      font-size: 12px;
+      color: #e2e8f0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.07);
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+    .teal { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #2dd4bf; }
+
+    .token-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #f8fafc;
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .token-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #042019;
+    }
+
+    /* SLIDE-OVER SETTINGS DRAWER */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 14, 0.65);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      z-index: 900;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .settings-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(440px, 95vw);
+      height: 100vh;
+      background: #0b1220;
+      border-left: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.75);
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .settings-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-header h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .drawer-header p {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .close-drawer-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #e2e8f0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .drawer-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(6, 10, 18, 0.5);
+      overflow-x: auto;
+    }
+
+    .drawer-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .drawer-tab.active {
+      background: var(--accent-soft);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .drawer-body {
+      padding: 18px 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-pane.active {
+      display: flex;
+    }
+
+    .setting-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .setting-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+    }
+
+    .setting-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .logo-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .logo-preview-row .synced-round-logo {
+      width: 56px;
+      height: 56px;
+    }
+
+    .form-control, select.form-control {
+      width: 100%;
+      background: #080d17;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .range-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #6ee7b7;
+      min-width: 46px;
+      text-align: right;
+    }
+
+    .toggle-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      padding: 6px 0;
+    }
+
+    .drawer-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: #080d17;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #064e3b;
+      border: 1px solid #10b981;
+      color: #ecfdf5;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.28s ease;
+      z-index: 1200;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .middle-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="synced-round-logo" data-logo-target="true">
+          <img alt="ITTC Logo" />
+          <span class="logo-fallback">IT</span>
+        </div>
+        <div>
+          <div class="sidebar-brand-title" id="sidebarBrandName">ITTC Center</div>
+          <div class="sidebar-brand-sub" id="sidebarBrandSub">Technical Training &amp; Testing</div>
+        </div>
+      </div>
+
+      <div class="nav-label">Navigation Menu</div>
+      <button class="nav-item active">📊 Dashboard</button>
+      <button class="nav-item">👥 Student Management <span class="nav-pill-count">97</span></button>
+      <button class="nav-item">📋 Daily Job Register</button>
+      <button class="nav-item">⚡ Out of Student</button>
+      <button class="nav-item">👔 Staff &amp; Payroll</button>
+      <button class="nav-item">🌐 Overseas Companies</button>
+      <button class="nav-item">📦 Store Management</button>
+      <button class="nav-item">💲 Job Price &amp; Limits</button>
+      <button class="nav-item">🔄 Job Return / Retrain</button>
+      <button class="nav-item">💼 Accounts &amp; Cashbook <span class="nav-pill-count">Cashbook</span></button>
+      <button class="nav-item">📈 Analytics &amp; Reports</button>
+      <button class="nav-item">🛡️ Super Admin <span class="nav-pill-count">Protected</span></button>
+
+      <!-- Central Settings Trigger -->
+      <button type="button" class="nav-item settings-trigger" id="openSettingsBtn">
+        <span>⚙️ Center Settings</span>
+        <span class="nav-pill-count">Live</span>
+      </button>
+
+      <button class="nav-item">📁 DocuList &amp; Passport <span class="nav-pill-count">Master</span></button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>Dashboard Overview</h2>
+          <p>Real-time performance metrics and today's jobs summary</p>
+        </div>
+        <div class="topbar-right">
+          <div class="lang-switch">
+            <button type="button" class="lang-btn" data-lang="BN">BN</button>
+            <button type="button" class="lang-btn active" data-lang="EN">EN</button>
+          </div>
+          <div class="clock-box">
+            <div>19-11-2026</div>
+            <div id="liveClock">12:12:00 PM</div>
+          </div>
+          <button type="button" class="top-action-btn">+ Add Student</button>
+          <button type="button" class="top-action-btn primary">+ New Job Entry</button>
+        </div>
+      </div>
+
+      <!-- HERO BANNER -->
+      <header class="hero-banner reveal" style="animation-delay: 0.05s;">
+        <div class="hero-left">
+          <div class="hero-logo-frame">
+            <div class="hero-logo-ring"></div>
+            <div class="synced-round-logo" data-logo-target="true">
+              <img alt="Institute Logo" />
+              <span class="logo-fallback">IT</span>
+            </div>
+          </div>
+          <div>
+            <div class="hero-meta">
+              <span class="live-dot"></span>
+              <span>Dashboard Overview</span>
+              <span>•</span>
+              <span>19-11-2026</span>
+            </div>
+            <h1 class="hero-title" id="heroInstituteTitle">WELCOME TO IDEAL TECHNICAL TRAINING &amp; TESTING CENTER</h1>
+            <p class="hero-subtitle" id="heroInstituteSub">Practical Test &amp; Management System</p>
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <button type="button" class="btn btn-emerald">+ New Student Job</button>
+          <button type="button" class="btn btn-ghost">+ Register Student</button>
+        </div>
+      </header>
+
+      <!-- KPI CARDS -->
+      <section class="kpi-grid">
+        <div class="kpi-card reveal" style="animation-delay: 0.1s;">
+          <div class="kpi-top"><span>Total Registered Students</span><span>👥</span></div>
+          <div class="kpi-val" data-target="97">0</div>
+        </div>
+        <div class="kpi-card emerald reveal" style="animation-delay: 0.14s;">
+          <div class="kpi-top"><span>Today's Active Jobs</span><span>💼</span></div>
+          <div class="kpi-val" data-target="21">0</div>
+        </div>
+        <div class="kpi-card emerald reveal" style="animation-delay: 0.18s;">
+          <div class="kpi-top"><span>Total Contract Value</span><span>📄</span></div>
+          <div class="kpi-val" data-prefix="৳" data-target="8730000">৳0</div>
+        </div>
+        <div class="kpi-card reveal" style="animation-delay: 0.22s;">
+          <div class="kpi-top"><span>Total Received Deposit</span><span>💳</span></div>
+          <div class="kpi-val" data-prefix="৳" data-target="3536000">৳0</div>
+        </div>
+        <div class="kpi-card amber reveal" style="animation-delay: 0.26s;">
+          <div class="kpi-top"><span>Total Course Due</span><span>⚠️</span></div>
+          <div class="kpi-val" data-prefix="৳" data-target="5194000">৳0</div>
+        </div>
+        <div class="kpi-card reveal" style="animation-delay: 0.3s;">
+          <div class="kpi-top"><span>All-Time Completed Jobs</span><span>✓</span></div>
+          <div class="kpi-val" data-target="46">0</div>
+        </div>
+      </section>
+
+      <!-- CATEGORY & QUICK ACTIONS -->
+      <section class="middle-grid">
+        <div class="panel reveal" style="animation-delay: 0.35s;">
+          <div class="panel-head">
+            <div>
+              <h3>Today's Category Job Summary</h3>
+              <p>Distribution of today practical test plates — click any category to issue a job</p>
+            </div>
+            <a href="#" class="panel-link">Daily Register →</a>
+          </div>
+          <div class="cat-list">
+            <div class="cat-chip active"><span>1G FLAT</span><span class="num">13</span></div>
+            <div class="cat-chip"><span>2G HORIZONTAL</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>3G VERTICAL</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>4G OVERHEAD (ARC)</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>4G OVERHEAD TIG</span><span class="num">0</span></div>
+            <div class="cat-chip active"><span>6G ARC</span><span class="num">3</span></div>
+            <div class="cat-chip active"><span>6G TIG</span><span class="num">5</span></div>
+            <div class="cat-chip"><span>2" PIPE FULL TIG</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>MIG FLUX CORD</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>MIG SOLID WIRE</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>MIG WITH CERAMIC</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>3G TIG PLATE</span><span class="num">0</span></div>
+            <div class="cat-chip"><span>6G 2" FULL TIG</span><span class="num">0</span></div>
+          </div>
+        </div>
+
+        <div class="panel reveal" style="animation-delay: 0.4s;">
+          <div class="panel-head">
+            <div>
+              <h3>Quick Actions</h3>
+              <p>Fast shortcuts for daily testing workflow</p>
+            </div>
+          </div>
+          <div class="quick-stack">
+            <div class="quick-card emerald">
+              <div>
+                <div class="quick-card-title">+ New Student Job</div>
+                <div class="quick-card-sub">Issue test token for registered student</div>
+              </div>
+              <span>→</span>
+            </div>
+            <div class="quick-card amber">
+              <div>
+                <div class="quick-card-title">⚡ Out of Student Job</div>
+                <div class="quick-card-sub">Quick slip &amp; test token entry</div>
+              </div>
+              <span>→</span>
+            </div>
+            <div class="quick-card">
+              <div>
+                <div class="quick-card-title">👤 Add New Student</div>
+                <div class="quick-card-sub">Register new trainee &amp; contract</div>
+              </div>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECENT JOB ENTRIES -->
+      <section class="panel reveal" style="animation-delay: 0.45s;">
+        <div class="panel-head">
+          <div>
+            <h3>Recent Job Entries</h3>
+            <p>Last registered practical test jobs with instant token print</p>
+          </div>
+          <a href="#" class="panel-link">View All Register</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>DATE</th>
+              <th>JOB NO</th>
+              <th>STUDENT NAME</th>
+              <th>STUDENT CODE</th>
+              <th>CATEGORY</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>19-11-2026</td>
+              <td class="mono">20261119-019</td>
+              <td><strong>MD IBRAHIM</strong></td>
+              <td class="teal">12/387</td>
+              <td>6G ARC</td>
+              <td style="text-align: right;">
+                <button type="button" class="token-btn" onclick="printToken({ jobNumber: '20261119-019', jobCategory: '6G ARC', studentName: 'MD IBRAHIM', studentCode: '12/387', testingDate: '19-11-2026' })">🖨️ Token</button>
+              </td>
+            </tr>
+            <tr>
+              <td>19-11-2026</td>
+              <td class="mono">20261119-018</td>
+              <td><strong>MD ISMAIL HASAN</strong></td>
+              <td class="teal">17/1</td>
+              <td>1G FLAT</td>
+              <td style="text-align: right;">
+                <button type="button" class="token-btn" onclick="printToken({ jobNumber: '20261119-018', jobCategory: '1G FLAT', studentName: 'MD ISMAIL HASAN', studentCode: '17/1', testingDate: '19-11-2026' })">🖨️ Token</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <!-- DRAWER BACKDROP -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <!-- SLIDE-OVER CENTER SETTINGS DRAWER -->
+  <aside class="settings-drawer" id="settingsDrawer" aria-label="Center Settings">
+    <div class="drawer-header">
+      <div>
+        <h3>⚙️ Center Settings</h3>
+        <p>Changes apply live across the dashboard &amp; token print</p>
+      </div>
+      <button type="button" class="close-drawer-btn" id="closeSettingsBtn">✕</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <button type="button" class="drawer-tab active" data-tab="branding">Logo &amp; Brand</button>
+      <button type="button" class="drawer-tab" data-tab="typography">Fonts &amp; Size</button>
+      <button type="button" class="drawer-tab" data-tab="appearance">Theme &amp; Motion</button>
+      <button type="button" class="drawer-tab" data-tab="token">Token Print</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- TAB 1: LOGO & BRAND -->
+      <div class="tab-pane active" id="tab-branding">
+        <div class="setting-box">
+          <label class="setting-label">Synced Round Logo (Sidebar &amp; Banner)</label>
+          <p class="setting-hint">Uploading a logo updates both round logos together and applies to your token print.</p>
+          <div class="logo-preview-row">
+            <div class="synced-round-logo" data-logo-target="true">
+              <img alt="Preview Logo" />
+              <span class="logo-fallback">IT</span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input type="file" id="drawerLogoInput" accept="image/*" hidden />
+              <button type="button" class="btn btn-emerald" id="drawerUploadBtn">🖼️ Upload Logo</button>
+              <button type="button" class="btn btn-ghost" id="drawerResetLogoBtn">↺ Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-box">
+          <label class="setting-label" for="inputInstituteName">Institute Title</label>
+          <input type="text" id="inputInstituteName" class="form-control" value="WELCOME TO IDEAL TECHNICAL TRAINING & TESTING CENTER" />
+
+          <label class="setting-label" for="inputInstituteSub" style="margin-top: 10px;">Institute Subtitle</label>
+          <input type="text" id="inputInstituteSub" class="form-control" value="Practical Test & Management System" />
+        </div>
+      </div>
+
+      <!-- TAB 2: FONTS & SIZE -->
+      <div class="tab-pane" id="tab-typography">
+        <div class="setting-box">
+          <label class="setting-label" for="fontFamilySelect">Font Family (English &amp; Bangla)</label>
+          <p class="setting-hint">Select your preferred font for headings and dashboard text.</p>
+          <select id="fontFamilySelect" class="form-control">
+            <option value="'Plus Jakarta Sans', 'Hind Siliguri', sans-serif">Plus Jakarta Sans + Hind Siliguri</option>
+            <option value="'Hind Siliguri', 'Plus Jakarta Sans', sans-serif">Hind Siliguri (Bangla Focus)</option>
+            <option value="'Noto Sans Bengali', 'Inter', sans-serif">Noto Sans Bengali + Inter</option>
+            <option value="'Inter', 'Hind Siliguri', sans-serif">Inter + Hind Siliguri</option>
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+          </select>
+        </div>
+
+        <div class="setting-box">
+          <label class="setting-label">Global Font Size Scale</label>
+          <p class="setting-hint">Adjust overall text size smoothly across the software.</p>
+          <div class="range-row">
+            <input type="range" id="fontScaleRange" min="85" max="120" step="5" value="100" />
+            <span class="range-badge" id="fontScaleBadge">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: THEME & MOTION -->
+      <div class="tab-pane" id="tab-appearance">
+        <div class="setting-box">
+          <label class="setting-label" for="accentThemeSelect">Accent Color Preset</label>
+          <select id="accentThemeSelect" class="form-control">
+            <option value="emerald">Emerald Green (Default)</option>
+            <option value="navy">Golden Yellow &amp; Dark</option>
+            <option value="flame">Flame Orange &amp; Dark</option>
+          </select>
+        </div>
+
+        <div class="setting-box">
+          <div class="toggle-line">
+            <span>Enable Animations &amp; Motion Graphics</span>
+            <input type="checkbox" id="motionToggle" checked />
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: TOKEN PRINT -->
+      <div class="tab-pane" id="tab-token">
+        <div class="setting-box">
+          <div class="toggle-line">
+            <span>Show Center Round Logo on 3"×3.5" Token</span>
+            <input type="checkbox" id="tokenLogoToggle" checked />
+          </div>
+          <p class="setting-hint" style="margin-top: 6px; margin-bottom: 0;">
+            Token prints on A4 centered horizontally with 0.3in top margin, all black text, and no payment info.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-ghost" id="resetAllSettingsBtn">Reset All</button>
+      <button type="button" class="btn btn-emerald" id="saveSettingsBtn">💾 Save Settings</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toastBox">Settings saved!</div>
+
+  <script>
+    const SETTINGS_KEY = 'ittc_center_settings_v1';
+
+    const defaultSettings = {
+      logoDataUrl: '',
+      instituteTitle: 'WELCOME TO IDEAL TECHNICAL TRAINING & TESTING CENTER',
+      instituteSub: 'Practical Test & Management System',
+      fontFamily: "'Plus Jakarta Sans', 'Hind Siliguri', sans-serif",
+      fontScale: 100,
+      accentTheme: 'emerald',
+      animationsEnabled: true,
+      tokenShowLogo: true
+    };
+
+    let currentSettings = { ...defaultSettings };
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (raw) {
+          currentSettings = { ...defaultSettings, ...JSON.parse(raw) };
+        }
+      } catch (e) {
+        console.warn('Settings load fallback:', e);
+      }
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(currentSettings));
+      } catch (e) {
+        console.warn('Settings save warning:', e);
+      }
+      showToast('Settings saved & applied!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // Apply all settings live to DOM
+    function applySettingsToUI() {
+      // 1. Sync both round logos
+      document.querySelectorAll('[data-logo-target="true"]').forEach(wrap => {
+        const img = wrap.querySelector('img');
+        const fb = wrap.querySelector('.logo-fallback');
+        if (currentSettings.logoDataUrl) {
+          img.src = currentSettings.logoDataUrl;
+          img.style.display = 'block';
+          fb.style.display = 'none';
+        } else {
+          img.removeAttribute('src');
+          img.style.display = 'none';
+          fb.style.display = 'block';
+        }
+      });
+
+      // 2. Title & Subtitle
+      document.getElementById('heroInstituteTitle').textContent = currentSettings.instituteTitle;
+      document.getElementById('heroInstituteSub').textContent = currentSettings.instituteSub;
+
+      // 3. Font & Scale
+      document.documentElement.style.setProperty('--font-body', currentSettings.fontFamily);
+      document.documentElement.style.setProperty('--font-display', currentSettings.fontFamily);
+      document.documentElement.style.setProperty('--font-scale', (currentSettings.fontScale / 100).toFixed(2));
+
+      // 4. Theme & Animations
+      document.body.classList.remove('theme-navy', 'theme-flame');
+      if (currentSettings.accentTheme === 'navy') document.body.classList.add('theme-navy');
+      if (currentSettings.accentTheme === 'flame') document.body.classList.add('theme-flame');
+      document.body.classList.toggle('no-animations', !currentSettings.animationsEnabled);
+
+      // Sync Drawer Inputs
+      document.getElementById('inputInstituteName').value = currentSettings.instituteTitle;
+      document.getElementById('inputInstituteSub').value = currentSettings.instituteSub;
+      document.getElementById('fontFamilySelect').value = currentSettings.fontFamily;
+      document.getElementById('fontScaleRange').value = currentSettings.fontScale;
+      document.getElementById('fontScaleBadge').textContent = `${currentSettings.fontScale}%`;
+      document.getElementById('accentThemeSelect').value = currentSettings.accentTheme;
+      document.getElementById('motionToggle').checked = currentSettings.animationsEnabled;
+      document.getElementById('tokenLogoToggle').checked = currentSettings.tokenShowLogo;
+    }
+
+    // Drawer Open / Close
+    const drawer = document.getElementById('settingsDrawer');
+    const backdrop = document.getElementById('drawerBackdrop');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+    }
+
+    document.getElementById('openSettingsBtn').addEventListener('click', openDrawer);
+    document.getElementById('closeSettingsBtn').addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+
+    // Drawer Tabs
+    document.querySelectorAll('.drawer-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    // Logo Upload & Reset inside Drawer
+    const drawerLogoInput = document.getElementById('drawerLogoInput');
+    document.getElementById('drawerUploadBtn').addEventListener('click', () => drawerLogoInput.click());
+
+    drawerLogoInput.addEventListener('change', e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentSettings.logoDataUrl = reader.result;
+        applySettingsToUI();
+        saveSettings();
+      };
+      reader.readAsDataURL(file);
+      drawerLogoInput.value = '';
+    });
+
+    document.getElementById('drawerResetLogoBtn').addEventListener('click', () => {
+      currentSettings.logoDataUrl = '';
+      applySettingsToUI();
+      saveSettings();
+    });
+
+    // Live inputs
+    document.getElementById('inputInstituteName').addEventListener('input', e => {
+      currentSettings.instituteTitle = e.target.value;
+      applySettingsToUI();
+    });
+
+    document.getElementById('inputInstituteSub').addEventListener('input', e => {
+      currentSettings.instituteSub = e.target.value;
+      applySettingsToUI();
+    });
+
+    document.getElementById('fontFamilySelect').addEventListener('change', e => {
+      currentSettings.fontFamily = e.target.value;
+      applySettingsToUI();
+    });
+
+    document.getElementById('fontScaleRange').addEventListener('input', e => {
+      currentSettings.fontScale = Number(e.target.value);
+      applySettingsToUI();
+    });
+
+    document.getElementById('accentThemeSelect').addEventListener('change', e => {
+      currentSettings.accentTheme = e.target.value;
+      applySettingsToUI();
+    });
+
+    document.getElementById('motionToggle').addEventListener('change', e => {
+      currentSettings.animationsEnabled = e.target.checked;
+      applySettingsToUI();
+    });
+
+    document.getElementById('tokenLogoToggle').addEventListener('change', e => {
+      currentSettings.tokenShowLogo = e.target.checked;
+    });
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
+    document.getElementById('resetAllSettingsBtn').addEventListener('click', () => {
+      currentSettings = { ...defaultSettings };
+      applySettingsToUI();
+      saveSettings();
+    });
+
+    // KPI Count-up
+    document.querySelectorAll('.kpi-val[data-target]').forEach(el => {
+      const target = Number(el.dataset.target) || 0;
+      const prefix = el.dataset.prefix || '';
+      const duration = 950;
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = prefix + Math.round(target * eased).toLocaleString('en-IN');
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+
+    // Live Clock
+    function tickClock() {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-US', { hour12: true });
+    }
+    setInterval(tickClock, 1000);
+    tickClock();
+
+    // New Tab Token Print (3in x 3.5in on A4, 0.3in top margin, all black, no payment)
+    function printToken(job) {
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert('Please allow pop-ups to print token.');
+        return;
+      }
+
+      const logoBlock = currentSettings.tokenShowLogo
+        ? `<div class="mini-round-seal">
+             ${currentSettings.logoDataUrl
+               ? `<img src="${currentSettings.logoDataUrl}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;margin-bottom:2px;" />`
+               : `<div class="seal-cap">✓</div>`}
+             <div class="seal-title">IDEAL TECHNICAL<br>TRAINING &amp; TESTING CENTER</div>
+             <div class="seal-sub">ID: ${job.jobNumber} | CODE: ${job.studentCode}</div>
+           </div>`
+        : '';
+
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Token ${job.jobNumber}</title>
+          <style>
+            @page { size: A4 portrait; margin: 0.3in 0 0 0; }
+            * { box-sizing: border-box; margin: 0; padding: 0; color: #000000; }
+            body { width: 100%; background: #ffffff; font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif; }
+            .wrap { width: 100%; display: flex; justify-content: center; padding-top: 0.3in; }
+            .card {
+              width: 3in; height: 3.5in; border: 2px solid #000000; border-radius: 10px;
+              padding: 8px 10px; text-align: center; display: flex; flex-direction: column;
+              justify-content: space-between; background: #ffffff;
+            }
+            .inst { font-size: 9.5px; font-weight: 800; line-height: 1.15; }
+            .badge { display: inline-block; background: #000000; color: #ffffff; font-size: 8.8px; font-weight: 700; padding: 2.5px 12px; border-radius: 4px; margin: 4px 0; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid #000000; border-radius: 6px; margin-bottom: 4px; }
+            .cell { padding: 4px; }
+            .cell:first-child { border-right: 1.5px solid #000000; }
+            .lbl { font-size: 7px; font-weight: 700; }
+            .val { font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+            .row { display: flex; justify-content: space-between; font-size: 10px; padding: 2.5px 0; border-bottom: 1px dotted #000000; }
+            .row:last-child { border-bottom: none; }
+            .seal-wrap { display: flex; justify-content: center; align-items: center; }
+            .mini-round-seal {
+              width: 116px; height: 116px; border-radius: 50%; border: 2.5px solid #000000;
+              display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px;
+            }
+            .seal-cap { font-size: 14px; font-weight: 900; line-height: 1; margin-bottom: 2px; }
+            .seal-title { font-size: 5px; font-weight: 800; line-height: 1.15; }
+            .seal-sub { font-size: 4.5px; font-weight: 700; margin-top: 3px; }
+            .barcode { height: 20px; width: 80%; margin: 0 auto 3px; background: repeating-linear-gradient(90deg, #000 0px, #000 1.8px, #fff 1.8px, #fff 3.5px, #000 3.5px, #000 5px, #fff 5px, #fff 8px); }
+            .printed { font-size: 8px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+          </style>
+        </head>
+        <body>
+          <div class="wrap">
+            <div class="card">
+              <div>
+                <div class="inst">IDEAL TECHNICAL TRAINING &amp; TESTING CENTER</div>
+                <div class="badge">DAILY JOB TOKEN</div>
+                <div class="grid">
+                  <div class="cell"><div class="lbl">JOB NUMBER</div><div class="val">${job.jobNumber}</div></div>
+                  <div class="cell"><div class="lbl">JOB CATEGORY</div><div class="val">${job.jobCategory}</div></div>
+                </div>
+                <div>
+                  <div class="row"><span>Student Name:</span><strong>${job.studentName}</strong></div>
+                  <div class="row"><span>Student Code:</span><strong>${job.studentCode}</strong></div>
+                  <div class="row"><span>Testing Date:</span><strong>${job.testingDate}</strong></div>
+                </div>
+              </div>
+              <div class="seal-wrap">${logoBlock}</div>
+              <div>
+                <div class="barcode"></div>
+                <div class="printed">Printed: ${new Date().toLocaleString('en-GB')}</div>
+              </div>
+            </div>
+          </div>
+          <script>window.onload = () => window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    loadSettings();
+    applySettingsToUI();
+  </script>
+</body>
+</html>

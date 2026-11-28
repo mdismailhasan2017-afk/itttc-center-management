@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GENERAL ACCOUNTS - Ideal Technical Training & Testing Center</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "SolaimanLipi", "Nikosh", "Segoe UI", Tahoma, sans-serif;
+    }
+
+    :root {
+      --bg: #090d16;
+      --panel: #0f172a;
+      --card: #131c2e;
+      --border: #24324a;
+      --accent: #f97316;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Top Header & Tabs */
+    .topbar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .topbar h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .topbar p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--panel);
+      padding: 5px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-green { background: #16a34a; }
+    .btn-blue { background: #2563eb; }
+    .btn-secondary {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .view-section {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .view-section.active {
+      display: flex;
+    }
+
+    /* Dashboard Cards */
+    .kpi-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .kpi-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .income-text { color: var(--green); }
+    .expense-text { color: var(--red); }
+    .blue-text { color: #60a5fa; }
+    .purple-text { color: #c084fc; }
+
+    /* 3 Separate Graphs for Officials */
+    .officials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .official-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .official-role {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--muted);
+    }
+
+    .official-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .official-amount {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .graph-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      height: 150px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      position: relative;
+    }
+
+    .bar-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bar-fill {
+      width: 100%;
+      max-width: 34px;
+      border-radius: 5px 5px 0 0;
+      min-height: 4px;
+      transition: height 0.35s ease;
+    }
+
+    .bar-val {
+      font-size: 10px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .bar-lbl {
+      font-size: 9.5px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .official-quick-form {
+      display: flex;
+      gap: 6px;
+    }
+
+    .official-quick-form input {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .dashboard-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .summary-table th {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* Sheet View */
+    .workspace {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      outline: none;
+    }
+
+    .sheet-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .excel-container {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #1d4ed8;
+      padding: 8px;
+      overflow-x: auto;
+      border-radius: 4px;
+    }
+
+    .excel-sheet-header {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #000000;
+    }
+
+    table.excel-table {
+      width: 100%;
+      min-width: 960px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 11px;
+      color: #000000;
+    }
+
+    table.excel-table th,
+    table.excel-table td {
+      border: 1px solid #000000;
+      padding: 2px 4px;
+      height: 21px;
+      vertical-align: middle;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .hdr-peach {
+      background-color: #f4b084;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .bg-green {
+      background-color: #00b050 !important;
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .bg-yellow {
+      background-color: #ffff00 !important;
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .bold { font-weight: 700; }
+
+    td[contenteditable="true"]:focus {
+      outline: 2px solid #16a34a;
+      background-color: #f0fdf4;
+    }
+
+    .row-del-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      border-radius: 3px;
+      font-size: 10px;
+      padding: 0 4px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1100px) {
+      .officials-grid,
+      .kpi-grid-3 { grid-template-columns: 1fr; }
+      .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-grid-2,
+      .workspace { grid-template-columns: 1fr; }
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 6mm;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      .topbar,
+      #dashboardView,
+      .workspace > .card:first-child,
+      .sheet-controls,
+      .no-print {
+        display: none !important;
+      }
+      #sheetView {
+        display: block !important;
+      }
+      .container,
+      .workspace,
+      .workspace > .card:last-child {
+        display: block !important;
+        background: #ffffff !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      .excel-container {
+        border: 1.5px solid #000000 !important;
+        padding: 4px !important;
+        overflow: visible !important;
+      }
+      table.excel-table {
+        min-width: 100% !important;
+        font-size: 9.5px !important;
+      }
+      table.excel-table th,
+      table.excel-table td {
+        height: 18px !important;
+        padding: 2px 4px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Header -->
+    <header class="topbar">
+      <div>
+        <h1>GENERAL ACCOUNTS</h1>
+        <p>IDEAL TECHNICAL TRAINING &amp; TESTING CENTER (itttc.com)</p>
+      </div>
+
+      <div class="nav-tabs">
+        <button type="button" class="tab-btn active" data-target="dashboardView">📊 হিসাবের সামারি (Dashboard)</button>
+        <button type="button" class="tab-btn" data-target="sheetView">📑 হিসাব খাতা (Excel শীট)</button>
+      </div>
+
+      <div class="topbar-actions">
+        <select id="dashDateFilter" style="background:var(--panel); color:var(--text); border:1px solid var(--border); padding:7px 10px; border-radius:6px; font-size:12px;">
+          <option value="ALL">সব তারিখ</option>
+          <option value="২২.১১.২০২৬" selected>তারিখ: ২২.১১.২০২৬</option>
+          <option value="২১.১১.২০২৬">তারিখ: ২১.১১.২০২৬</option>
+        </select>
+        <button type="button" class="btn btn-blue" id="exportJsonBtn">💾 Backup</button>
+        <button type="button" class="btn btn-secondary" id="importJsonBtn">📂 Restore</button>
+        <input type="file" id="jsonFileInput" accept="application/json" style="display:none;" />
+        <button type="button" class="btn" id="printPdfBtn">📄 Download PDF</button>
+      </div>
+    </header>
+
+    <!-- অপশন ১: হিসাবের সামারি ড্যাশবোর্ড -->
+    <section class="view-section active" id="dashboardView">
+      <!-- ১. PP, WELDING JOB FEE, PIPE FITTER JOB FEE দৈনিক জমা -->
+      <div class="kpi-grid-3">
+        <div class="card">
+          <div class="kpi-label">১. দৈনিক PP (PPE) বাবদ জমা</div>
+          <div class="kpi-value income-text" id="ppDepositVal">৳৪০০০</div>
+          <div class="kpi-sub" id="ppDepositSub">সিলেক্টেড তারিখের PP / পিপিই ফি জমা</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">২. WELDING JOB FEE বাবদ জমা</div>
+          <div class="kpi-value blue-text" id="weldingJobFeeVal">৳৪৫৪০০</div>
+          <div class="kpi-sub" id="weldingJobFeeSub">সিলেক্টেড তারিখের Welding Job Fee জমা</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">৩. PIPE FITTER JOB FEE বাবদ জমা</div>
+          <div class="kpi-value purple-text" id="pipeFitterFeeVal">৳০</div>
+          <div class="kpi-sub" id="pipeFitterFeeSub">সিলেক্টেড তারিখের Pipe Fitter Job Fee জমা</div>
+        </div>
+      </div>
+
+      <!-- সামগ্রিক নগদ / ব্যয় / ব্যাংক / নিট ব্যালেন্স -->
+      <div class="kpi-grid-4">
+        <div class="card">
+          <div class="kpi-label">মোট নগদ টাকা (পূর্বের ব্যালেন্সসহ)</div>
+          <div class="kpi-value income-text" id="cardTotalCash">৳২৭৯৮২৩</div>
+          <div class="kpi-sub">পূর্বের নগদ ও নতুন নগদ আয়</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">মোট ব্যয়ের টাকা</div>
+          <div class="kpi-value expense-text" id="cardTotalExpense">৳২৫১৩১০</div>
+          <div class="kpi-sub">ব্যাংক জমা ও সকল খরচসহ</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">ব্যাংকে জমা আছে</div>
+          <div class="kpi-value" id="cardTotalBank">৳৭৬৭৫৭০</div>
+          <div class="kpi-sub">মোট ব্যাংক স্থিতি</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">নগদ ব্যালেন্স / (নগদ + ব্যাংক)</div>
+          <div class="kpi-value" id="cardNetBalance">৳২৮৫১৩ / ৳৭৯৬০৮৩</div>
+          <div class="kpi-sub">হাতে নগদ ও সর্বমোট ব্যালেন্স</div>
+        </div>
+      </div>
+
+      <!-- ২. ৩ জন কর্মকর্তার হিসাব ও আলাদা আলাদা গ্রাফ -->
+      <div class="officials-grid">
+        <!-- MANAGING DIRECTOR (SABUJ KAZI) -->
+        <div class="official-card">
+          <div class="official-role">MANAGING DIRECTOR</div>
+          <div class="official-name" style="color:var(--accent);">SABUJ KAZI</div>
+          <div class="official-amount expense-text" id="mdTotalVal">৳০</div>
+          <div class="graph-box" id="mdGraph"></div>
+          <div class="official-quick-form">
+            <input type="number" id="mdAmtInput" placeholder="টাকা লিখুন" min="1" />
+            <input type="text" id="mdNoteInput" placeholder="নোট (ঐচ্ছিক)" />
+            <button type="button" class="btn" onclick="addOfficialDraw('SABUJ KAZI', 'mdAmtInput', 'mdNoteInput')">+ নিন</button>
+          </div>
+        </div>
+
+        <!-- DIRECTOR (SOHEL KAZI) -->
+        <div class="official-card">
+          <div class="official-role">DIRECTOR</div>
+          <div class="official-name" class="blue-text" style="color:#60a5fa;">SOHEL KAZI</div>
+          <div class="official-amount expense-text" id="dirTotalVal">৳১১১০</div>
+          <div class="graph-box" id="dirGraph"></div>
+          <div class="official-quick-form">
+            <input type="number" id="dirAmtInput" placeholder="টাকা লিখুন" min="1" />
+            <input type="text" id="dirNoteInput" placeholder="নোট (ঐচ্ছিক)" />
+            <button type="button" class="btn btn-blue" onclick="addOfficialDraw('SOHEL KAZI', 'dirAmtInput', 'dirNoteInput')">+ নিন</button>
+          </div>
+        </div>
+
+        <!-- GENERAL MANAGER (SALIM MAHMMUD) -->
+        <div class="official-card">
+          <div class="official-role">GENERAL MANAGER</div>
+          <div class="official-name" style="color:#c084fc;">SALIM MAHMMUD</div>
+          <div class="official-amount expense-text" id="gmTotalVal">৳০</div>
+          <div class="graph-box" id="gmGraph"></div>
+          <div class="official-quick-form">
+            <input type="number" id="gmAmtInput" placeholder="টাকা লিখুন" min="1" />
+            <input type="text" id="gmNoteInput" placeholder="নোট (ঐচ্ছিক)" />
+            <button type="button" class="btn btn-green" onclick="addOfficialDraw('SALIM MAHMMUD', 'gmAmtInput', 'gmNoteInput')">+ নিন</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- দৈনিক জমা ও কর্মকর্তাদের লেনদেনের সারাংশ -->
+      <div class="dashboard-grid-2">
+        <div class="card">
+          <div class="card-title">দৈনিক PP, WELDING JOB &amp; PIPE FITTER জমা সামারি</div>
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>তারিখ</th>
+                <th>PP জমা</th>
+                <th>WELDING JOB FEE</th>
+                <th>PIPE FITTER FEE</th>
+              </tr>
+            </thead>
+            <tbody id="dailyCategorySummaryBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
+            <div class="card-title" style="margin-bottom:0;">হিসাব খাতায় যেতে ক্লিক করুন</div>
+            <button type="button" class="btn btn-green" onclick="switchTab('sheetView')">📑 Excel শীট ওপেন করুন →</button>
+          </div>
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>কর্মকর্তা</th>
+                <th>তারিখ / বিবরণ</th>
+                <th>পরিমাণ</th>
+              </tr>
+            </thead>
+            <tbody id="officialsLedgerBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- অপশন ২: হিসাব খাতা (Excel শীট) -->
+    <section class="view-section" id="sheetView">
+      <div class="workspace">
+        <div class="card">
+          <h2 style="font-size:14px; color:var(--accent);">নতুন হিসাব এন্ট্রি</h2>
+          <p style="font-size:11px; color:var(--muted); margin-top:2px;">PP, Welding Job Fee, Pipe Fitter Fee বা কর্মকর্তার হিসাব যুক্ত করুন</p>
+
+          <form class="form-grid" id="entryForm">
+            <div class="field">
+              <label for="fDate">তারিখ</label>
+              <input type="text" id="fDate" value="২২.১১.২০২৬" required />
+            </div>
+
+            <div class="field">
+              <label for="fEntryType">এন্ট্রির ধরন</label>
+              <select id="fEntryType">
+                <option value="incomeCash">আয় — নগদ টাকা</option>
+                <option value="expenseCash">ব্যয় — ব্যয়ের টাকা</option>
+                <option value="bankDeposit">ব্যাংকে জমা</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="fDesc">বিবরণ (যেমন: PP ফি, Welding Job Fee, Pipe Fitter Fee বা নাম)</label>
+              <input type="text" id="fDesc" placeholder="যেমন: PP ফি বা Welding Job Fee" required />
+            </div>
+
+            <div class="field">
+              <label for="fAmount">টাকার পরিমাণ</label>
+              <input type="number" id="fAmount" min="1" placeholder="যেমন: 10000" required />
+            </div>
+
+            <button type="submit" class="btn">+ Excel শীটে যুক্ত করুন</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="sheet-controls">
+            <div class="filter-group">
+              <input type="text" id="searchInput" placeholder="তারিখ বা বিবরণ খুঁজুন..." />
+              <select id="filterMode">
+                <option value="all">সব সারি দেখুন</option>
+                <option value="income">শুধু আয়ের সারি</option>
+                <option value="expense">শুধু ব্যয়ের সারি</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-green" id="addBlankRowBtn">+ খালি সারি</button>
+              <button type="button" class="btn btn-secondary" id="resetSampleBtn">Sample Data</button>
+            </div>
+          </div>
+
+          <div class="excel-container">
+            <div class="excel-sheet-header">IDEAL TECHNICAL TRAINING &amp; TESTING CENTER — GENERAL ACCOUNTS</div>
+
+            <table class="excel-table" id="excelTable">
+              <colgroup>
+                <col style="width: 68px;" />
+                <col style="width: 185px;" />
+                <col style="width: 62px;" />
+                <col style="width: 62px;" />
+                <col style="width: 205px;" />
+                <col style="width: 62px;" />
+                <col style="width: 62px;" />
+                <col style="width: 62px;" />
+                <col style="width: 62px;" />
+                <col style="width: 66px;" />
+                <col style="width: 68px;" />
+                <col class="no-print" style="width: 26px;" />
+              </colgroup>
+
+              <thead>
+                <tr>
+                  <th class="hdr-peach" rowspan="2">তারিখ</th>
+                  <th class="hdr-peach" colspan="3">আয়</th>
+                  <th class="hdr-peach" colspan="2">ব্যয়</th>
+                  <th class="hdr-peach" rowspan="2">নগদ টাকা</th>
+                  <th class="hdr-peach" rowspan="2">ব্যয়ের টাকা</th>
+                  <th class="hdr-peach" rowspan="2">ব্যাংকে জমা</th>
+                  <th class="hdr-peach" rowspan="2">নগদ ব্যালেন্স</th>
+                  <th class="hdr-peach" rowspan="2">নগদ +<br />ব্যাংক</th>
+                  <th class="hdr-peach no-print" rowspan="2">×</th>
+                </tr>
+                <tr>
+                  <th class="hdr-peach">আয়ের মাধ্যম</th>
+                  <th class="hdr-peach">নগদ টাকা</th>
+                  <th class="hdr-peach">ব্যাংকে জমা</th>
+                  <th class="hdr-peach">ব্যয়ের মাধ্যম</th>
+                  <th class="hdr-peach">ব্যয়ের টাকা</th>
+                </tr>
+              </thead>
+
+              <tbody id="sheetBody"></tbody>
+
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td class="bold">ব্যাংকে জমা আছে=</td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right bold">ব্যাংক জমা আছে</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="no-print"></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td class="text-center bg-green" id="totInCashLeft">২৭৯৮২৩</td>
+                  <td class="text-center bg-green" id="totInBankLeft">৭৬৭৫৭০</td>
+                  <td class="text-right bold">ক্যাশে জমা আছে=</td>
+                  <td class="text-center bg-yellow" id="totOutLeft">২৫১৩১০</td>
+                  <td class="text-center bg-green" id="totInCashRight">২৭৯৮২৩</td>
+                  <td class="text-center bg-yellow" id="totOutRight">২৫১৩১০</td>
+                  <td class="text-center bg-green" id="totInBankRight">৭৬৭৫৭০</td>
+                  <td class="text-center bg-green" id="netCashBalance">২৮৫১৩</td>
+                  <td class="text-center bg-green" id="netCashPlusBank">৭৯৬০৮৩</td>
+                  <td class="no-print"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "itttc_general_accounts_officials_v1";
+
+    const defaultRows = [
+      { isOpening: true, date: "২১.১১.২০২৬", inDesc: "পূর্বের ব্যালেন্স", inCash: "২১৫৪২৩", inBank: "৫৪৩৫৭০", outDesc: "পূর্বের ব্যালেন্স", outCash: "" },
+      { date: "২২.১১.২০২৬", inDesc: "সাইফুল ইসলাম WELDING JOB FEE ১৩/২২১ (৪৫৮২)", inCash: "১০০০০", inBank: "", outDesc: "", outCash: "" },
+      { date: "২২.১১.২০২৬", inDesc: "রাওহা WELDING JOB FEE ১০/২৮৫ (৪৫৩৩)", inCash: "৫৪০০", inBank: "", outDesc: "মাস্ক ক্রয়", outCash: "১০০" },
+      { date: "২২.১১.২০২৬", inDesc: "মেহেদী WELDING JOB FEE ১৩/৩৮৯ (৪৫৮৪)", inCash: "১০০০০", inBank: "", outDesc: "মেহেদী ১৩/২৮৯ জব ফি ফেরত দেওয়া হলো", outCash: "৫৪০০" },
+      { date: "২২.১১.২০২৬", inDesc: "নাহিদ হাসান WELDING JOB FEE নতুন ভর্তি (৪৫৮৫)", inCash: "১০০০০", inBank: "", outDesc: "গাড়ি ভাড়া", outCash: "২০০" },
+      { date: "২২.১১.২০২৬", inDesc: "নাহিদ হাসান PP ফি নতুন ভর্তি (৪৫৮৫)", inCash: "১০০০", inBank: "", outDesc: "SOHEL KAZI অনলাইন পার্সেল", outCash: "১১১০" },
+      { date: "২২.১১.২০২৬", inDesc: "লিমন WELDING JOB FEE নতুন ভর্তি (৪৫৮৬)", inCash: "১৫০০০", inBank: "", outDesc: "নাজমুল ভাইকে নভেম্বর মাসের বেতন থেকে অগ্রীম", outCash: "৫০০" },
+      { date: "২২.১১.২০২৬", inDesc: "লিমন PP ফি নতুন ভর্তি (৪৫৮৬)", inCash: "১৫০০", inBank: "", outDesc: "মাসুদ রানা এন্টারপ্রাইজকে প্রদান", outCash: "২০০০০" },
+      { date: "২২.১১.২০২৬", inDesc: "রায়হান WELDING JOB FEE নতুন ভর্তি (৪৫৮৭)", inCash: "১০০০০", inBank: "২২৪০০০", outDesc: "ব্যাংকে জমা", outCash: "২২৪০০০" },
+      { date: "২২.১১.২০২৬", inDesc: "রায়হান PP ফি নতুন ভর্তি (৪৫৮৭)", inCash: "১৫০০", inBank: "", outDesc: "", outCash: "" },
+      { date: "২২.১১.২০২৬", inDesc: "", inCash: "", inBank: "", outDesc: "", outCash: "" },
+      { date: "২২.১১.২০২৬", inDesc: "", inCash: "", inBank: "", outDesc: "", outCash: "" }
+    ];
+
+    let rowsData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || JSON.parse(JSON.stringify(defaultRows));
+
+    const sheetBody = document.getElementById("sheetBody");
+    const entryForm = document.getElementById("entryForm");
+    const searchInput = document.getElementById("searchInput");
+    const filterMode = document.getElementById("filterMode");
+    const dashDateFilter = document.getElementById("dashDateFilter");
+
+    function switchTab(targetId) {
+      document.querySelectorAll(".tab-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("data-target") === targetId);
+      });
+      document.querySelectorAll(".view-section").forEach(sec => {
+        sec.classList.toggle("active", sec.id === targetId);
+      });
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.getAttribute("data-target")));
+    });
+
+    function bnToEn(str) {
+      return String(str || "")
+        .replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d))
+        .replace(/[^\d.-]/g, "");
+    }
+
+    function enToBn(num) {
+      if (num === "" || num === null || isNaN(num)) return "";
+      const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+      return String(Math.round(num)).replace(/\d/g, d => bnDigits[d]);
+    }
+
+    function parseNum(val) {
+      const n = parseFloat(bnToEn(val));
+      return isNaN(n) ? 0 : n;
+    }
+
+    function saveRows() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rowsData));
+    }
+
+    function syncDashDateSelect() {
+      const current = dashDateFilter.value;
+      const dates = Array.from(new Set(rowsData.map(r => (r.date || "").trim()).filter(Boolean)));
+      dashDateFilter.innerHTML = `<option value="ALL">সব তারিখ</option>` +
+        dates.map(d => `<option value="${d}">তারিখ: ${d}</option>`).join("");
+      if (Array.from(dashDateFilter.options).some(o => o.value === current)) {
+        dashDateFilter.value = current;
+      } else {
+        dashDateFilter.value = "ALL";
+      }
+    }
+
+    function renderOfficialGraph(containerId, items, colorHex) {
+      const box = document.getElementById(containerId);
+      if (!items.length) {
+        box.innerHTML = `<div style="width:100%; text-align:center; font-size:11.5px; color:var(--muted); align-self:center;">কোনো উত্তোলন নেই</div>`;
+        return;
+      }
+      const maxVal = Math.max(...items.map(i => i.amount), 1);
+      box.innerHTML = items.slice(-5).map(item => {
+        const pct = Math.max(12, Math.round((item.amount / maxVal) * 75));
+        return `
+          <div class="bar-col">
+            <span class="bar-val">৳${enToBn(item.amount)}</span>
+            <div class="bar-fill" style="height:${pct}%; background:${colorHex};"></div>
+            <span class="bar-lbl">${item.label}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderTable() {
+      syncDashDateSelect();
+      const q = searchInput.value.trim().toLowerCase();
+      const mode = filterMode.value;
+
+      sheetBody.innerHTML = "";
+
+      rowsData.forEach((row, idx) => {
+        const hasIncome = parseNum(row.inCash) > 0 || parseNum(row.inBank) > 0;
+        const hasExpense = parseNum(row.outCash) > 0;
+
+        if (!row.isOpening) {
+          if (mode === "income" && !hasIncome) return;
+          if (mode === "expense" && !hasExpense) return;
+          if (q) {
+            const combined = `${row.date} ${row.inDesc} ${row.outDesc}`.toLowerCase();
+            if (!combined.includes(q)) return;
+          }
+        }
+
+        const tr = document.createElement("tr");
+        const inCashClass = row.isOpening ? "bg-green" : "";
+        const inBankClass = row.isOpening ? "bg-yellow" : (parseNum(row.inBank) > 0 ? "bg-green" : "");
+
+        tr.innerHTML = `
+          <td class="text-center" contenteditable="true" data-idx="${idx}" data-field="date">${row.date || ""}</td>
+          <td contenteditable="true" data-idx="${idx}" data-field="inDesc">${row.inDesc || ""}</td>
+          <td class="text-center ${inCashClass}" contenteditable="true" data-idx="${idx}" data-field="inCash">${row.inCash || ""}</td>
+          <td class="text-center ${inBankClass}" contenteditable="true" data-idx="${idx}" data-field="inBank">${row.inBank || ""}</td>
+          <td contenteditable="true" data-idx="${idx}" data-field="outDesc">${row.outDesc || ""}</td>
+          <td class="text-center" contenteditable="true" data-idx="${idx}" data-field="outCash">${row.outCash || ""}</td>
+          <td class="text-center ${inCashClass}">${row.inCash || ""}</td>
+          <td class="text-center">${row.outCash || ""}</td>
+          <td class="text-center ${inBankClass}">${row.inBank || ""}</td>
+          <td></td>
+          <td></td>
+          <td class="text-center no-print">
+            ${row.isOpening ? "" : `<button type="button" class="row-del-btn" onclick="removeRow(${idx})">×</button>`}
+          </td>
+        `;
+        sheetBody.appendChild(tr);
+      });
+
+      recalculateDashboard();
+    }
+
+    function recalculateDashboard() {
+      let totalInCash = 0;
+      let totalInBank = 0;
+      let totalOutCash = 0;
+
+      const selectedDate = dashDateFilter.value;
+      let ppSelected = 0;
+      let weldingSelected = 0;
+      let pipeSelected = 0;
+
+      const dailyCatMap = {};
+
+      let mdTotal = 0;
+      let dirTotal = 0;
+      let gmTotal = 0;
+
+      const mdItems = [];
+      const dirItems = [];
+      const gmItems = [];
+      const officialLedgerRows = [];
+
+      rowsData.forEach(r => {
+        const cIn = parseNum(r.inCash);
+        const bIn = parseNum(r.inBank);
+        const cOut = parseNum(r.outCash);
+
+        totalInCash += cIn;
+        totalInBank += bIn;
+        totalOutCash += cOut;
+
+        const descIn = (r.inDesc || "").toUpperCase();
+        const descOut = (r.outDesc || "").toUpperCase();
+        const dt = (r.date || "").trim();
+
+        const isPP = descIn.includes("PP") || descIn.includes("পিপিই");
+        const isPipe = descIn.includes("PIPE") || descIn.includes("FITTER") || descIn.includes("পাইপ");
+        const isWelding = !isPP && !isPipe && (descIn.includes("WELDING") || descIn.includes("JOB") || descIn.includes("জব"));
+
+        const amtIn = cIn + bIn;
+
+        if (dt && !r.isOpening) {
+          if (!dailyCatMap[dt]) {
+            dailyCatMap[dt] = { pp: 0, welding: 0, pipe: 0 };
+          }
+          if (isPP) dailyCatMap[dt].pp += amtIn;
+          if (isWelding) dailyCatMap[dt].welding += amtIn;
+          if (isPipe) dailyCatMap[dt].pipe += amtIn;
+        }
+
+        if (!r.isOpening && (selectedDate === "ALL" || dt === selectedDate)) {
+          if (isPP) ppSelected += amtIn;
+          if (isWelding) weldingSelected += amtIn;
+          if (isPipe) pipeSelected += amtIn;
+        }
+
+        // Officials tracking from Expense column
+        if (!r.isOpening && cOut > 0) {
+          if (descOut.includes("SABUJ") || descOut.includes("সবুজ")) {
+            mdTotal += cOut;
+            mdItems.push({ label: dt || "এন্ট্রি", amount: cOut });
+            officialLedgerRows.push({ person: "SABUJ KAZI (MD)", note: `${dt} — ${r.outDesc}`, amt: cOut });
+          } else if (descOut.includes("SOHEL") || descOut.includes("সোহেল")) {
+            dirTotal += cOut;
+            dirItems.push({ label: dt || "এন্ট্রি", amount: cOut });
+            officialLedgerRows.push({ person: "SOHEL KAZI (Director)", note: `${dt} — ${r.outDesc}`, amt: cOut });
+          } else if (descOut.includes("SALIM") || descOut.includes("সালিম")) {
+            gmTotal += cOut;
+            gmItems.push({ label: dt || "এন্ট্রি", amount: cOut });
+            officialLedgerRows.push({ person: "SALIM MAHMMUD (GM)", note: `${dt} — ${r.outDesc}`, amt: cOut });
+          }
+        }
+      });
+
+      const netCash = totalInCash - totalOutCash;
+      const netTotal = netCash + totalInBank;
+
+      const bnInCash = enToBn(totalInCash);
+      const bnInBank = enToBn(totalInBank);
+      const bnOutCash = enToBn(totalOutCash);
+      const bnNetCash = enToBn(netCash);
+      const bnNetTotal = enToBn(netTotal);
+
+      // Excel Footer Totals
+      document.getElementById("totInCashLeft").textContent = bnInCash;
+      document.getElementById("totInCashRight").textContent = bnInCash;
+      document.getElementById("totInBankLeft").textContent = bnInBank;
+      document.getElementById("totInBankRight").textContent = bnInBank;
+      document.getElementById("totOutLeft").textContent = bnOutCash;
+      document.getElementById("totOutRight").textContent = bnOutCash;
+      document.getElementById("netCashBalance").textContent = bnNetCash;
+      document.getElementById("netCashPlusBank").textContent = bnNetTotal;
+
+      // Top 3 Category Cards
+      document.getElementById("ppDepositVal").textContent = "৳" + enToBn(ppSelected);
+      document.getElementById("weldingJobFeeVal").textContent = "৳" + enToBn(weldingSelected);
+      document.getElementById("pipeFitterFeeVal").textContent = "৳" + enToBn(pipeSelected);
+
+      // Overall Cards
+      document.getElementById("cardTotalCash").textContent = "৳" + bnInCash;
+      document.getElementById("cardTotalExpense").textContent = "৳" + bnOutCash;
+      document.getElementById("cardTotalBank").textContent = "৳" + bnInBank;
+      document.getElementById("cardNetBalance").textContent = `৳${bnNetCash} / ৳${bnNetTotal}`;
+
+      // 3 Officials Totals & Separate Graphs
+      document.getElementById("mdTotalVal").textContent = "৳" + enToBn(mdTotal);
+      document.getElementById("dirTotalVal").textContent = "৳" + enToBn(dirTotal);
+      document.getElementById("gmTotalVal").textContent = "৳" + enToBn(gmTotal);
+
+      renderOfficialGraph("mdGraph", mdItems, "#f97316");
+      renderOfficialGraph("dirGraph", dirItems, "#3b82f6");
+      renderOfficialGraph("gmGraph", gmItems, "#22c55e");
+
+      // Daily Category Summary Table
+      const catBody = document.getElementById("dailyCategorySummaryBody");
+      const catEntries = Object.entries(dailyCatMap);
+      catBody.innerHTML = catEntries.length
+        ? catEntries.map(([d, v]) => `
+            <tr>
+              <td><strong>${d}</strong></td>
+              <td class="income-text">৳${enToBn(v.pp)}</td>
+              <td class="blue-text">৳${enToBn(v.welding)}</td>
+              <td class="purple-text">৳${enToBn(v.pipe)}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="4" style="text-align:center; color:var(--muted);">কোনো তথ্য নেই</td></tr>`;
+
+      // Officials Ledger Table
+      const offBody = document.getElementById("officialsLedgerBody");
+      offBody.innerHTML = officialLedgerRows.length
+        ? officialLedgerRows.map(o => `
+            <tr>
+              <td><strong>${o.person}</strong></td>
+              <td>${o.note}</td>
+              <td class="expense-text">৳${enToBn(o.amt)}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="3" style="text-align:center; color:var(--muted);">এখনো কোনো উত্তোলন যুক্ত হয়নি</td></tr>`;
+    }
+
+    window.addOfficialDraw = function(officialName, amtInputId, noteInputId) {
+      const amtEl = document.getElementById(amtInputId);
+      const noteEl = document.getElementById(noteInputId);
+      const amount = parseNum(amtEl.value);
+      if (!amount || amount <= 0) return;
+
+      const noteText = noteEl.value.trim();
+      const desc = `${officialName}${noteText ? " — " + noteText : ""}`;
+      const currentDate = dashDateFilter.value !== "ALL" ? dashDateFilter.value : "২২.১১.২০২৬";
+
+      rowsData.push({
+        date: currentDate,
+        inDesc: "",
+        inCash: "",
+        inBank: "",
+        outDesc: desc,
+        outCash: enToBn(amount)
+      });
+
+      amtEl.value = "";
+      noteEl.value = "";
+      saveRows();
+      renderTable();
+    };
+
+    sheetBody.addEventListener("input", e => {
+      const cell = e.target;
+      const idx = cell.getAttribute("data-idx");
+      const field = cell.getAttribute("data-field");
+      if (idx === null || !field) return;
+
+      rowsData[idx][field] = cell.textContent.trim();
+
+      const tr = cell.parentElement;
+      if (field === "inCash") tr.children[6].textContent = rowsData[idx].inCash;
+      if (field === "outCash") tr.children[7].textContent = rowsData[idx].outCash;
+      if (field === "inBank") {
+        tr.children[8].textContent = rowsData[idx].inBank;
+        if (!rowsData[idx].isOpening) {
+          const hasBank = parseNum(rowsData[idx].inBank) > 0;
+          cell.classList.toggle("bg-green", hasBank);
+          tr.children[8].classList.toggle("bg-green", hasBank);
+        }
+      }
+
+      saveRows();
+      recalculateDashboard();
+    });
+
+    window.removeRow = function(idx) {
+      rowsData.splice(idx, 1);
+      saveRows();
+      renderTable();
+    };
+
+    entryForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const dateVal = document.getElementById("fDate").value.trim();
+      const typeVal = document.getElementById("fEntryType").value;
+      const descVal = document.getElementById("fDesc").value.trim();
+      const amtBn = enToBn(parseNum(document.getElementById("fAmount").value));
+
+      const newRow = { date: dateVal, inDesc: "", inCash: "", inBank: "", outDesc: "", outCash: "" };
+
+      if (typeVal === "incomeCash") {
+        newRow.inDesc = descVal;
+        newRow.inCash = amtBn;
+      } else if (typeVal === "expenseCash") {
+        newRow.outDesc = descVal;
+        newRow.outCash = amtBn;
+      } else if (typeVal === "bankDeposit") {
+        newRow.inBank = amtBn;
+        newRow.outDesc = descVal || "ব্যাংকে জমা";
+        newRow.outCash = amtBn;
+      }
+
+      const firstBlankIndex = rowsData.findIndex(r => !r.isOpening && !r.inDesc && !r.outDesc && !r.inCash && !r.outCash && !r.inBank);
+      if (firstBlankIndex !== -1) {
+        rowsData[firstBlankIndex] = newRow;
+      } else {
+        rowsData.push(newRow);
+      }
+
+      document.getElementById("fDesc").value = "";
+      document.getElementById("fAmount").value = "";
+      saveRows();
+      renderTable();
+    });
+
+    document.getElementById("addBlankRowBtn").addEventListener("click", () => {
+      rowsData.push({ date: "২২.১১.২০২৬", inDesc: "", inCash: "", inBank: "", outDesc: "", outCash: "" });
+      saveRows();
+      renderTable();
+    });
+
+    document.getElementById("resetSampleBtn").addEventListener("click", () => {
+      rowsData = JSON.parse(JSON.stringify(defaultRows));
+      saveRows();
+      renderTable();
+    });
+
+    document.getElementById("printPdfBtn").addEventListener("click", () => {
+      switchTab("sheetView");
+      setTimeout(() => window.print(), 100);
+    });
+
+    document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(rowsData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "itttc-general-accounts.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    const jsonFileInput = document.getElementById("jsonFileInput");
+    document.getElementById("importJsonBtn").addEventListener("click", () => jsonFileInput.click());
+    jsonFileInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (Array.isArray(parsed)) {
+            rowsData = parsed;
+            saveRows();
+            renderTable();
+          }
+        } catch (_) {}
+      };
+      reader.readAsText(file);
+    });
+
+    dashDateFilter.addEventListener("change", recalculateDashboard);
+    searchInput.addEventListener("input", renderTable);
+    filterMode.addEventListener("change", renderTable);
+
+    renderTable();
+  </script>
+</body>
+</html>

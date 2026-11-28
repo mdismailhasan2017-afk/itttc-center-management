@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ideal Technical Training & Testing Center — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #070b14;
+      --bg-surface: #0d1422;
+      --bg-surface-hover: #121c2e;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-emerald: rgba(16, 185, 129, 0.35);
+      --border-amber: rgba(245, 158, 11, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.22);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.2);
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 25%, rgba(59, 130, 246, 0.07), transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px 24px 40px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Keyframes */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(25px, -15px) scale(1.08); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      50% { transform: scale(1.25); opacity: 0.85; box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    }
+
+    @keyframes shimmerSweep {
+      0% { transform: translateX(-120%) skewX(-20deg); }
+      100% { transform: translateX(250%) skewX(-20deg); }
+    }
+
+    @keyframes ringRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .reveal {
+      opacity: 0;
+      animation: fadeSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* 1. HERO HEADER */
+    .hero-banner {
+      position: relative;
+      background: linear-gradient(125deg, #092c28 0%, #0b2229 48%, #0d1626 100%);
+      border: 1px solid var(--border-emerald);
+      border-radius: 16px;
+      padding: 20px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* Ambient Motion Orb */
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+      top: -120px;
+      left: 18%;
+      pointer-events: none;
+      animation: floatSlow 8s ease-in-out infinite;
+    }
+
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Animated Logo Seal */
+    .brand-logo-wrap {
+      position: relative;
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+    }
+
+    .brand-logo-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(255, 255, 255, 0.55);
+      position: absolute;
+      animation: ringRotate 22s linear infinite;
+    }
+
+    .brand-logo-inner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #062823;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: #6ee7b7;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      animation: pulseDot 2s infinite;
+    }
+
+    .hero-title {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn {
+      position: relative;
+      overflow: hidden;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.55);
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      animation: shimmerSweep 3.5s infinite;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* 2. KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px 18px;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(240px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.07), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .kpi-card:hover::before {
+      opacity: 1;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .kpi-card.accent-emerald { border-color: rgba(16, 185, 129, 0.28); }
+    .kpi-card.accent-emerald:hover { border-color: var(--emerald); }
+
+    .kpi-card.accent-amber {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.05) 0%, var(--bg-surface) 100%);
+    }
+    .kpi-card.accent-amber:hover { border-color: var(--amber); }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .kpi-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .kpi-card:hover .kpi-icon {
+      transform: scale(1.12) rotate(-4deg);
+    }
+
+    .icon-blue { background: rgba(59, 130, 246, 0.14); color: #60a5fa; }
+    .icon-emerald { background: rgba(16, 185, 129, 0.14); color: #34d399; }
+    .icon-purple { background: rgba(139, 92, 246, 0.14); color: #a78bfa; }
+    .icon-amber { background: rgba(245, 158, 11, 0.16); color: #fbbf24; }
+    .icon-slate { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; }
+
+    .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    /* 3. MIDDLE SECTION: CATEGORY & QUICK ACTIONS */
+    .middle-grid {
+      display: grid;
+      grid-template-columns: 1.85fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .panel-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .link-action {
+      color: var(--emerald);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s ease, color 0.2s ease;
+    }
+
+    .link-action:hover {
+      gap: 8px;
+      color: #6ee7b7;
+    }
+
+    /* Category Pills */
+    .category-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .cat-pill {
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9px;
+      padding: 8px 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cat-pill:hover {
+      transform: translateY(-2px);
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(148, 163, 184, 0.4);
+      color: #ffffff;
+    }
+
+    .cat-pill.active {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #6ee7b7;
+      box-shadow: 0 4px 16px -4px rgba(16, 185, 129, 0.3);
+    }
+
+    .cat-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      color: #94a3b8;
+    }
+
+    .cat-pill.active .cat-count {
+      background: var(--emerald);
+      color: #042f2e;
+      font-weight: 800;
+    }
+
+    /* Quick Actions */
+    .quick-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .quick-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.6);
+      text-decoration: none;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .quick-item:hover {
+      transform: translateX(4px);
+    }
+
+    .quick-item.q-emerald {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .quick-item.q-emerald:hover {
+      border-color: var(--emerald);
+      box-shadow: 0 8px 22px -10px rgba(16, 185, 129, 0.5);
+    }
+
+    .quick-item.q-amber {
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .quick-item.q-amber:hover {
+      border-color: var(--amber);
+      box-shadow: 0 8px 22px -10px rgba(245, 158, 11, 0.45);
+    }
+
+    .quick-item.q-slate:hover {
+      border-color: rgba(148, 163, 184, 0.45);
+      background: rgba(30, 41, 59, 0.65);
+    }
+
+    .quick-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .quick-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .q-emerald .quick-badge { background: var(--emerald); color: #042f2e; }
+    .q-amber .quick-badge { background: var(--amber); color: #451a03; }
+    .q-slate .quick-badge { background: rgba(148, 163, 184, 0.16); color: #e2e8f0; }
+
+    .quick-title {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .quick-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .quick-arrow {
+      font-size: 16px;
+      color: var(--text-secondary);
+      transition: transform 0.25s ease;
+    }
+
+    .quick-item:hover .quick-arrow {
+      transform: translateX(4px);
+      color: #ffffff;
+    }
+
+    /* 4. RECENT JOB TABLE */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(30, 41, 59, 0.45);
+    }
+
+    tbody td {
+      padding: 14px;
+      font-size: 13px;
+      color: #e2e8f0;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .code-teal {
+      color: #2dd4bf;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .token-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #f8fafc;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s ease;
+    }
+
+    .token-btn:hover {
+      background: var(--emerald);
+      border-color: var(--emerald);
+      color: #042f2e;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px -4px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .middle-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .hero-banner { flex-direction: column; align-items: flex-start; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 1. HERO HEADER -->
+    <header class="hero-banner reveal" style="animation-delay: 0.05s;">
+      <div class="hero-left">
+        <div class="brand-logo-wrap">
+          <div class="brand-logo-ring"></div>
+          <div class="brand-logo-inner">IT</div>
+        </div>
+        <div>
+          <div class="hero-meta">
+            <span class="live-dot"></span>
+            <span>Dashboard Overview</span>
+            <span>•</span>
+            <span>19-11-2026</span>
+          </div>
+          <h1 class="hero-title">WELCOME TO IDEAL TECHNICAL TRAINING &amp; TESTING CENTER</h1>
+          <p class="hero-subtitle">Practical Test &amp; Management System</p>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="alert('New Student Job Modal')">
+          <span>+</span> New Student Job
+        </button>
+        <button class="btn btn-secondary" onclick="alert('Register Student Modal')">
+          <span>+</span> Register Student
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. KPI CARDS -->
+    <section class="kpi-grid">
+      <div class="kpi-card reveal" style="animation-delay: 0.1s;">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Registered Students</span>
+          <span class="kpi-icon icon-blue">👥</span>
+        </div>
+        <div class="kpi-value" data-target="97">0</div>
+      </div>
+
+      <div class="kpi-card accent-emerald reveal" style="animation-delay: 0.15s;">
+        <div class="kpi-top">
+          <span class="kpi-label">Today's Active Jobs</span>
+          <span class="kpi-icon icon-emerald">💼</span>
+        </div>
+        <div class="kpi-value" data-target="19">0</div>
+      </div>
+
+      <div class="kpi-card accent-emerald reveal" style="animation-delay: 0.2s;">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Contract Value</span>
+          <span class="kpi-icon icon-emerald">📄</span>
+        </div>
+        <div class="kpi-value" data-prefix="৳" data-target="8730000">৳0</div>
+      </div>
+
+      <div class="kpi-card reveal" style="animation-delay: 0.25s;">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Received Deposit</span>
+          <span class="kpi-icon icon-purple">💳</span>
+        </div>
+        <div class="kpi-value" data-prefix="৳" data-target="3486000">৳0</div>
+      </div>
+
+      <div class="kpi-card accent-amber reveal" style="animation-delay: 0.3s;">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Course Due</span>
+          <span class="kpi-icon icon-amber">⚠️</span>
+        </div>
+        <div class="kpi-value" data-prefix="৳" data-target="5244000">৳0</div>
+      </div>
+
+      <div class="kpi-card reveal" style="animation-delay: 0.35s;">
+        <div class="kpi-top">
+          <span class="kpi-label">All-Time Completed Jobs</span>
+          <span class="kpi-icon icon-slate">✓</span>
+        </div>
+        <div class="kpi-value" data-target="44">0</div>
+      </div>
+    </section>
+
+    <!-- 3. CATEGORY & QUICK ACTIONS -->
+    <section class="middle-grid">
+      <div class="panel reveal" style="animation-delay: 0.4s;">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Today's Category Job Summary</h2>
+            <p class="panel-subtitle">Distribution of today practical test plates — click any category to issue a job</p>
+          </div>
+          <a href="#" class="link-action">Daily Register <span>→</span></a>
+        </div>
+
+        <div class="category-pills">
+          <div class="cat-pill active"><span>1G FLAT</span><span class="cat-count">12</span></div>
+          <div class="cat-pill"><span>2G HORIZONTAL</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>3G VERTICAL</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>4G OVERHEAD (ARC)</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>4G OVERHEAD TIG</span><span class="cat-count">0</span></div>
+          <div class="cat-pill active"><span>6G ARC</span><span class="cat-count">2</span></div>
+          <div class="cat-pill active"><span>6G TIG</span><span class="cat-count">5</span></div>
+          <div class="cat-pill"><span>2" PIPE FULL TIG</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>MIG FLUX CORD</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>MIG SOLID WIRE</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>MIG WITH CERAMIC</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>3G TIG PLATE</span><span class="cat-count">0</span></div>
+          <div class="cat-pill"><span>6G 2" FULL TIG</span><span class="cat-count">0</span></div>
+        </div>
+      </div>
+
+      <div class="panel reveal" style="animation-delay: 0.45s;">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Quick Actions</h2>
+            <p class="panel-subtitle">Fast shortcuts for daily testing workflow</p>
+          </div>
+        </div>
+
+        <div class="quick-list">
+          <div class="quick-item q-emerald">
+            <div class="quick-left">
+              <div class="quick-badge">+</div>
+              <div>
+                <div class="quick-title">New Student Job</div>
+                <div class="quick-desc">Issue test token for registered student</div>
+              </div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
+
+          <div class="quick-item q-amber">
+            <div class="quick-left">
+              <div class="quick-badge">⚡</div>
+              <div>
+                <div class="quick-title">Out of Student Job</div>
+                <div class="quick-desc">Quick slip &amp; test token entry</div>
+              </div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
+
+          <div class="quick-item q-slate">
+            <div class="quick-left">
+              <div class="quick-badge">👤</div>
+              <div>
+                <div class="quick-title">Add New Student</div>
+                <div class="quick-desc">Register new trainee &amp; contract</div>
+              </div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. RECENT JOB ENTRIES -->
+    <section class="panel reveal" style="animation-delay: 0.5s;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Recent Job Entries</h2>
+          <p class="panel-subtitle">Last registered practical test jobs with instant token print</p>
+        </div>
+        <a href="#" class="link-action">View All Register</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>DATE</th>
+              <th>JOB NO</th>
+              <th>STUDENT NAME</th>
+              <th>STUDENT CODE</th>
+              <th>CATEGORY</th>
+              <th>PAYABLE</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>19-11-2026</td>
+              <td class="mono">20261119-019</td>
+              <td><strong>MD IBRAHIM</strong></td>
+              <td class="code-teal">12/387</td>
+              <td>6G ARC</td>
+              <td class="mono">৳1,500</td>
+              <td style="text-align: right;"><button class="token-btn">🖨️ Token</button></td>
+            </tr>
+            <tr>
+              <td>19-11-2026</td>
+              <td class="mono">20261119-018</td>
+              <td><strong>MD ISMAIL HASAN</strong></td>
+              <td class="code-teal">17/1</td>
+              <td>1G FLAT</td>
+              <td class="mono">৳800</td>
+              <td style="text-align: right;"><button class="token-btn">🖨️ Token</button></td>
+            </tr>
+            <tr>
+              <td>19-11-2026</td>
+              <td class="mono">20261119-017</td>
+              <td><strong>MD ISMAIL HASAN</strong></td>
+              <td class="code-teal">17/1</td>
+              <td>1G FLAT</td>
+              <td class="mono">৳800</td>
+              <td style="text-align: right;"><button class="token-btn">🖨️ Token</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ১. KPI কার্ডে মাউস স্পটলাইট ট্র্যাকিং
+    document.querySelectorAll('.kpi-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    // ২. সংখ্যাগুলোর স্মুথ কাউন্ট-আপ মোশন (Bangladeshi/Indian Number Format সহ)
+    function formatSouthAsian(num) {
+      return num.toLocaleString('en-IN');
+    }
+
+    document.querySelectorAll('.kpi-value[data-target]').forEach(el => {
+      const target = Number(el.dataset.target) || 0;
+      const prefix = el.dataset.prefix || '';
+      const duration = 1100;
+      const startTime = performance.now();
+
+      function update(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * easeOut);
+        el.textContent = `${prefix}${formatSouthAsian(current)}`;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+
+      requestAnimationFrame(update);
+    });
+  </script>
+</body>
+</html>

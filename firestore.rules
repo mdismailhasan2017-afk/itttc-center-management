@@ -1,0 +1,662 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    function incoming() {
+      return request.resource.data;
+    }
+    function existing() {
+      return resource.data;
+    }
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+    function isBootstrappedAdmin() {
+      return isEmailVerified() && request.auth.token.email == 'mdismailhasan2017@gmail.com';
+    }
+    function isAdmin() {
+      return isBootstrappedAdmin() || (isEmailVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+    function isValidStr(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+    function isNonNegNum(val) {
+      return (val is int || val is float) && val >= 0 && val <= 1000000000;
+    }
+    function isCenterOwner(centerId) {
+      return isEmailVerified() && (
+        get(/databases/$(database)/documents/centers/$(centerId)).data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Entity Validators
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'role', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'displayName', 'role', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        isValidStr(data.displayName, 1, 120) &&
+        data.role in ['owner', 'staff', 'admin'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        isValidStr(data.email, 3, 200) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAdminRecord(data) {
+      return data.keys().hasAll(['uid', 'email', 'grantedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'grantedAt']) &&
+        isValidId(data.uid) &&
+        isValidStr(data.email, 3, 200) &&
+        data.grantedAt is timestamp;
+    }
+
+    function isValidCenter(data) {
+      return data.keys().hasAll(['ownerId', 'name', 'subtitle', 'address', 'phone', 'slipFooter', 'accountsPass', 'adminUser', 'adminPass', 'navOrder', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'name', 'subtitle', 'address', 'phone', 'slipFooter', 'accountsPass', 'generalAccountsPass', 'adminUser', 'adminPass', 'navOrder', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.name, 1, 300) &&
+        isValidStr(data.subtitle, 0, 400) &&
+        isValidStr(data.address, 0, 500) &&
+        isValidStr(data.phone, 0, 60) &&
+        isValidStr(data.slipFooter, 0, 400) &&
+        isValidStr(data.accountsPass, 0, 60) &&
+        (!('generalAccountsPass' in data) || isValidStr(data.generalAccountsPass, 0, 60)) &&
+        isValidStr(data.adminUser, 0, 60) &&
+        isValidStr(data.adminPass, 0, 60) &&
+        data.navOrder is list &&
+        data.navOrder.size() <= 30 &&
+        (data.navOrder.size() == 0 || (data.navOrder[0] is string && data.navOrder[0].size() <= 40)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'name', 'code', 'fatherName', 'motherName', 'phone', 'guardianPhone', 'district', 'nid', 'trade', 'passportSubmitted', 'passportNo', 'passportCopyData', 'photoData', 'bioEnrolled', 'companyName', 'interviewPassedCompany', 'interviewDate', 'overseasStatus', 'destination', 'contract', 'deposit', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'name', 'code', 'fatherName', 'motherName', 'phone', 'guardianPhone', 'district', 'nid', 'trade', 'passportSubmitted', 'passportNo', 'passportCopyData', 'photoData', 'bioEnrolled', 'companyName', 'interviewPassedCompany', 'interviewDate', 'overseasStatus', 'destination', 'contract', 'deposit', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.name, 1, 420) &&
+        isValidStr(data.code, 1, 80) &&
+        isValidStr(data.fatherName, 0, 360) &&
+        isValidStr(data.motherName, 0, 360) &&
+        isValidStr(data.phone, 0, 60) &&
+        isValidStr(data.guardianPhone, 0, 60) &&
+        isValidStr(data.district, 0, 480) &&
+        isValidStr(data.nid, 0, 60) &&
+        isValidStr(data.trade, 0, 200) &&
+        data.passportSubmitted is bool &&
+        isValidStr(data.passportNo, 0, 60) &&
+        isValidStr(data.passportCopyData, 0, 150000) &&
+        isValidStr(data.photoData, 0, 150000) &&
+        data.bioEnrolled is bool &&
+        isValidStr(data.companyName, 0, 360) &&
+        isValidStr(data.interviewPassedCompany, 0, 420) &&
+        isValidStr(data.interviewDate, 0, 60) &&
+        data.overseasStatus in ['Not Applied', 'Interview Attended', 'Selected', 'Visa Processing', 'Flight Ready'] &&
+        isValidStr(data.destination, 0, 200) &&
+        isNonNegNum(data.contract) &&
+        isNonNegNum(data.deposit) &&
+        isValidStr(data.note, 0, 900) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidJob(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'no', 'sid', 'sname', 'cat', 'pay', 'discount', 'paid', 'verificationMethod', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'no', 'sid', 'sname', 'cat', 'pay', 'discount', 'paid', 'verificationMethod', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.no, 1, 80) &&
+        isValidStr(data.sid, 1, 80) &&
+        isValidStr(data.sname, 1, 420) &&
+        isValidStr(data.cat, 1, 200) &&
+        isNonNegNum(data.pay) &&
+        isNonNegNum(data.discount) &&
+        isNonNegNum(data.paid) &&
+        data.verificationMethod in ['biometric', 'supervisor'] &&
+        isValidStr(data.note, 0, 750) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidOutJob(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'no', 'name', 'phone', 'agent', 'cat', 'price', 'paid', 'paidTo', 'payRef', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'no', 'name', 'phone', 'agent', 'cat', 'price', 'paid', 'paidTo', 'payRef', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.no, 1, 80) &&
+        isValidStr(data.name, 1, 420) &&
+        isValidStr(data.phone, 0, 60) &&
+        isValidStr(data.agent, 0, 360) &&
+        isValidStr(data.cat, 1, 200) &&
+        isNonNegNum(data.price) &&
+        isNonNegNum(data.paid) &&
+        isValidStr(data.paidTo, 0, 200) &&
+        isValidStr(data.payRef, 0, 200) &&
+        isValidStr(data.note, 0, 750) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStaff(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'name', 'role', 'phone', 'email', 'nid', 'address', 'joinDate', 'bio', 'salary', 'paid', 'month', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'name', 'role', 'phone', 'email', 'nid', 'address', 'joinDate', 'bio', 'salary', 'paid', 'month', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.name, 1, 140) &&
+        isValidStr(data.role, 1, 80) &&
+        isValidStr(data.phone, 0, 40) &&
+        isValidStr(data.email, 0, 140) &&
+        isValidStr(data.nid, 0, 40) &&
+        isValidStr(data.address, 0, 200) &&
+        isValidStr(data.joinDate, 0, 20) &&
+        isValidStr(data.bio, 0, 250) &&
+        isNonNegNum(data.salary) &&
+        isNonNegNum(data.paid) &&
+        isValidStr(data.month, 0, 30) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStaffPayment(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'staffId', 'staffName', 'month', 'amount', 'method', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'staffId', 'staffName', 'month', 'amount', 'method', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.staffId, 1, 128) &&
+        isValidStr(data.staffName, 1, 140) &&
+        isValidStr(data.month, 1, 30) &&
+        isNonNegNum(data.amount) &&
+        isValidStr(data.method, 0, 40) &&
+        isValidStr(data.note, 0, 200) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCompany(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'name', 'country', 'contact', 'phone', 'address', 'demand', 'contractsCount', 'workersCount', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'name', 'country', 'contact', 'phone', 'address', 'demand', 'contractsCount', 'workersCount', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.name, 1, 140) &&
+        isValidStr(data.country, 1, 80) &&
+        isValidStr(data.contact, 0, 120) &&
+        isValidStr(data.phone, 0, 40) &&
+        isValidStr(data.address, 0, 200) &&
+        isValidStr(data.demand, 0, 160) &&
+        isNonNegNum(data.contractsCount) &&
+        isNonNegNum(data.workersCount) &&
+        isValidStr(data.note, 0, 300) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAgencyContract(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'companyName', 'country', 'trade', 'workersCount', 'status', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'companyName', 'country', 'trade', 'workersCount', 'status', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.companyName, 1, 140) &&
+        isValidStr(data.country, 1, 80) &&
+        isValidStr(data.trade, 1, 120) &&
+        isNonNegNum(data.workersCount) &&
+        data.status in ['Active', 'Completed', 'Pending'] &&
+        isValidStr(data.note, 0, 250) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStoreItem(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'code', 'item', 'category', 'shop', 'memo', 'qty', 'unit', 'min', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'code', 'item', 'category', 'shop', 'memo', 'qty', 'unit', 'min', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.code, 0, 40) &&
+        isValidStr(data.item, 1, 140) &&
+        isValidStr(data.category, 0, 80) &&
+        isValidStr(data.shop, 0, 120) &&
+        isValidStr(data.memo, 0, 80) &&
+        isNonNegNum(data.qty) &&
+        isValidStr(data.unit, 1, 30) &&
+        isNonNegNum(data.min) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStoreLog(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'itemId', 'code', 'itemName', 'movement', 'qty', 'shop', 'memo', 'amount', 'remarks', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'itemId', 'code', 'itemName', 'movement', 'qty', 'shop', 'memo', 'amount', 'remarks', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 20) &&
+        isValidStr(data.itemId, 1, 128) &&
+        isValidStr(data.code, 0, 40) &&
+        isValidStr(data.itemName, 1, 140) &&
+        data.movement in ['IN', 'OUT'] &&
+        isNonNegNum(data.qty) &&
+        isValidStr(data.shop, 0, 120) &&
+        isValidStr(data.memo, 0, 80) &&
+        isNonNegNum(data.amount) &&
+        isValidStr(data.remarks, 0, 250) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPrice(data) {
+      return data.keys().hasAll(['ownerId', 'cat', 'price', 'limit', 'active', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'cat', 'price', 'limit', 'active', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.cat, 1, 80) &&
+        isNonNegNum(data.price) &&
+        isNonNegNum(data.limit) &&
+        data.active is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidReturn(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'no', 'code', 'sname', 'cat', 'reason', 'act', 'fee', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'no', 'code', 'sname', 'cat', 'reason', 'act', 'fee', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.no, 1, 80) &&
+        isValidStr(data.code, 0, 80) &&
+        isValidStr(data.sname, 0, 420) &&
+        isValidStr(data.cat, 0, 200) &&
+        isValidStr(data.reason, 1, 750) &&
+        data.act in ['Retrain', 'Plate Return', 'Failed / Rework'] &&
+        isNonNegNum(data.fee) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCash(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'type', 'category', 'amt', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'type', 'category', 'amt', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        data.type in ['in', 'out'] &&
+        isValidStr(data.category, 0, 200) &&
+        isNonNegNum(data.amt) &&
+        isValidStr(data.note, 1, 750) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidGeneralAccountRow(data) {
+      return data.keys().hasAll(['ownerId', 'rowOrder', 'isOpening', 'date', 'inDesc', 'inCash', 'inBank', 'outDesc', 'outCash', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'rowOrder', 'isOpening', 'date', 'inDesc', 'inCash', 'inBank', 'outDesc', 'outCash', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isNonNegNum(data.rowOrder) &&
+        data.isOpening is bool &&
+        isValidStr(data.date, 0, 60) &&
+        isValidStr(data.inDesc, 0, 600) &&
+        isValidStr(data.inCash, 0, 120) &&
+        isValidStr(data.inBank, 0, 120) &&
+        isValidStr(data.outDesc, 0, 600) &&
+        isValidStr(data.outCash, 0, 120) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidDoc(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'code', 'title', 'docNo', 'expiry', 'who', 'trade', 'phone', 'status', 'medical', 'policeClearance', 'certificate', 'bmetVisa', 'flightStatus', 'flightDate', 'agencyCountry', 'note', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'code', 'title', 'docNo', 'expiry', 'who', 'trade', 'phone', 'status', 'medical', 'policeClearance', 'certificate', 'bmetVisa', 'flightStatus', 'flightDate', 'agencyCountry', 'note', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.code, 0, 80) &&
+        isValidStr(data.title, 1, 420) &&
+        isValidStr(data.docNo, 0, 120) &&
+        isValidStr(data.expiry, 0, 60) &&
+        isValidStr(data.who, 1, 420) &&
+        isValidStr(data.trade, 0, 200) &&
+        isValidStr(data.phone, 0, 60) &&
+        data.status in ['Original Held', 'Copy Submitted', 'Pending'] &&
+        data.medical in ['Fit', 'Pending', 'Unfit'] &&
+        data.policeClearance in ['Received', 'Applied', 'Pending'] &&
+        data.certificate in ['Issued', 'In Progress', 'Pending'] &&
+        data.bmetVisa in ['Stamped', 'Processing', 'Pending'] &&
+        data.flightStatus in ['Scheduled', 'Waiting', 'Departed'] &&
+        isValidStr(data.flightDate, 0, 60) &&
+        isValidStr(data.agencyCountry, 0, 420) &&
+        isValidStr(data.note, 0, 750) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['ownerId', 'date', 'time', 'action', 'module', 'detail', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'date', 'time', 'action', 'module', 'detail', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        isValidStr(data.date, 1, 60) &&
+        isValidStr(data.time, 1, 60) &&
+        isValidStr(data.action, 1, 120) &&
+        isValidStr(data.module, 1, 120) &&
+        isValidStr(data.detail, 1, 750) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // Users & Isolated PII
+    match /users/{userId} {
+      allow get: if isEmailVerified() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+      allow list: if isEmailVerified() && (resource.data.uid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isEmailVerified() &&
+        isValidId(userId) &&
+        isValidUserProfile(incoming()) &&
+        request.auth.uid == userId &&
+        incoming().uid == request.auth.uid &&
+        (incoming().role == 'owner' || isAdmin()) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isEmailVerified() &&
+        isValidId(userId) &&
+        isValidUserProfile(incoming()) &&
+        (request.auth.uid == userId || isAdmin()) &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          isAdmin() ||
+          (incoming().role == existing().role && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'updatedAt']))
+        );
+      allow delete: if isAdmin() && isValidId(userId);
+
+      match /private/info {
+        allow get: if isEmailVerified() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+        allow create: if isEmailVerified() &&
+          isValidId(userId) &&
+          isValidUserPrivateInfo(incoming()) &&
+          request.auth.uid == userId &&
+          incoming().uid == request.auth.uid &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() &&
+          isValidId(userId) &&
+          isValidUserPrivateInfo(incoming()) &&
+          (request.auth.uid == userId || isAdmin()) &&
+          incoming().uid == existing().uid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['email', 'updatedAt']);
+        allow delete: if isAdmin() && isValidId(userId);
+      }
+    }
+
+    // Admin Registry
+    match /admins/{adminUid} {
+      allow get: if isEmailVerified() && isValidId(adminUid) && (request.auth.uid == adminUid || isAdmin());
+      allow list: if isBootstrappedAdmin();
+      allow create: if isBootstrappedAdmin() &&
+        isValidId(adminUid) &&
+        isValidAdminRecord(incoming()) &&
+        incoming().uid == adminUid &&
+        incoming().grantedAt == request.time;
+      allow update: if false;
+      allow delete: if isBootstrappedAdmin() && isValidId(adminUid);
+    }
+
+    // Centers & Subcollections
+    match /centers/{centerId} {
+      allow get: if isEmailVerified() && isValidId(centerId) && (
+        (resource == null && centerId == ('center_' + request.auth.uid)) ||
+        (resource != null && (existing().ownerId == request.auth.uid || isAdmin()))
+      );
+      allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isEmailVerified() &&
+        isValidId(centerId) &&
+        isValidCenter(incoming()) &&
+        incoming().ownerId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isEmailVerified() &&
+        isValidId(centerId) &&
+        isValidCenter(incoming()) &&
+        (existing().ownerId == request.auth.uid || isAdmin()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'subtitle', 'address', 'phone', 'slipFooter', 'accountsPass', 'generalAccountsPass', 'adminUser', 'adminPass', 'navOrder', 'updatedAt']);
+      allow delete: if isEmailVerified() && isValidId(centerId) && (existing().ownerId == request.auth.uid || isAdmin());
+
+      match /students/{studentId} {
+        allow get: if isValidId(centerId) && isValidId(studentId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(studentId) &&
+          isValidStudent(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(studentId) &&
+          isValidStudent(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'name', 'code', 'fatherName', 'motherName', 'phone', 'guardianPhone', 'district', 'nid', 'trade', 'passportSubmitted', 'passportNo', 'passportCopyData', 'photoData', 'bioEnrolled', 'companyName', 'interviewPassedCompany', 'interviewDate', 'overseasStatus', 'destination', 'contract', 'deposit', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(studentId) && isCenterOwner(centerId);
+      }
+
+      match /jobs/{jobId} {
+        allow get: if isValidId(centerId) && isValidId(jobId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(jobId) &&
+          isValidJob(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(jobId) &&
+          isValidJob(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'no', 'sid', 'sname', 'cat', 'pay', 'discount', 'paid', 'verificationMethod', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(jobId) && isCenterOwner(centerId);
+      }
+
+      match /outs/{outId} {
+        allow get: if isValidId(centerId) && isValidId(outId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(outId) &&
+          isValidOutJob(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(outId) &&
+          isValidOutJob(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'no', 'name', 'phone', 'agent', 'cat', 'price', 'paid', 'paidTo', 'payRef', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(outId) && isCenterOwner(centerId);
+      }
+
+      match /staff/{staffId} {
+        allow get: if isValidId(centerId) && isValidId(staffId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(staffId) &&
+          isValidStaff(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(staffId) &&
+          isValidStaff(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'name', 'role', 'phone', 'email', 'nid', 'address', 'joinDate', 'bio', 'salary', 'paid', 'month', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(staffId) && isCenterOwner(centerId);
+      }
+
+      match /staffPayments/{paymentId} {
+        allow get: if isValidId(centerId) && isValidId(paymentId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(paymentId) &&
+          isValidStaffPayment(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(paymentId) &&
+          isValidStaffPayment(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'staffId', 'staffName', 'month', 'amount', 'method', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(paymentId) && isCenterOwner(centerId);
+      }
+
+      match /companies/{companyId} {
+        allow get: if isValidId(centerId) && isValidId(companyId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(companyId) &&
+          isValidCompany(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(companyId) &&
+          isValidCompany(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'name', 'country', 'contact', 'phone', 'address', 'demand', 'contractsCount', 'workersCount', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(companyId) && isCenterOwner(centerId);
+      }
+
+      match /agencyContracts/{contractId} {
+        allow get: if isValidId(centerId) && isValidId(contractId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(contractId) &&
+          isValidAgencyContract(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(contractId) &&
+          isValidAgencyContract(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'companyName', 'country', 'trade', 'workersCount', 'status', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(contractId) && isCenterOwner(centerId);
+      }
+
+      match /store/{itemId} {
+        allow get: if isValidId(centerId) && isValidId(itemId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(itemId) &&
+          isValidStoreItem(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(itemId) &&
+          isValidStoreItem(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'code', 'item', 'category', 'shop', 'memo', 'qty', 'unit', 'min', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(itemId) && isCenterOwner(centerId);
+      }
+
+      match /storeLogs/{logId} {
+        allow get: if isValidId(centerId) && isValidId(logId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(logId) &&
+          isValidStoreLog(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(logId) &&
+          isValidStoreLog(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'itemId', 'code', 'itemName', 'movement', 'qty', 'shop', 'memo', 'amount', 'remarks', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(logId) && isCenterOwner(centerId);
+      }
+
+      match /prices/{priceId} {
+        allow get: if isValidId(centerId) && isValidId(priceId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(priceId) &&
+          isValidPrice(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(priceId) &&
+          isValidPrice(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['cat', 'price', 'limit', 'active', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(priceId) && isCenterOwner(centerId);
+      }
+
+      match /returns/{returnId} {
+        allow get: if isValidId(centerId) && isValidId(returnId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(returnId) &&
+          isValidReturn(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(returnId) &&
+          isValidReturn(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'no', 'code', 'sname', 'cat', 'reason', 'act', 'fee', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(returnId) && isCenterOwner(centerId);
+      }
+
+      match /cash/{cashId} {
+        allow get: if isValidId(centerId) && isValidId(cashId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(cashId) &&
+          isValidCash(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(cashId) &&
+          isValidCash(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'type', 'category', 'amt', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(cashId) && isCenterOwner(centerId);
+      }
+
+      match /generalAccounts/{rowId} {
+        allow get: if isValidId(centerId) && isValidId(rowId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(rowId) &&
+          isValidGeneralAccountRow(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(rowId) &&
+          isValidGeneralAccountRow(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['rowOrder', 'isOpening', 'date', 'inDesc', 'inCash', 'inBank', 'outDesc', 'outCash', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(rowId) && isCenterOwner(centerId);
+      }
+
+      match /docs/{docId} {
+        allow get: if isValidId(centerId) && isValidId(docId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(docId) &&
+          isValidDoc(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isEmailVerified() && isValidId(centerId) && isValidId(docId) &&
+          isValidDoc(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time &&
+          (isAdmin() || incoming().diff(existing()).affectedKeys().hasOnly(['date', 'code', 'title', 'docNo', 'expiry', 'who', 'trade', 'phone', 'status', 'medical', 'policeClearance', 'certificate', 'bmetVisa', 'flightStatus', 'flightDate', 'agencyCountry', 'note', 'updatedAt']));
+        allow delete: if isValidId(centerId) && isValidId(docId) && isCenterOwner(centerId);
+      }
+
+      match /auditLogs/{logId} {
+        allow get: if isValidId(centerId) && isValidId(logId) && isCenterOwner(centerId);
+        allow list: if isEmailVerified() && (resource.data.ownerId == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isEmailVerified() && isValidId(centerId) && isValidId(logId) &&
+          isValidAuditLog(incoming()) && isCenterOwner(centerId) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if false;
+        allow delete: if isValidId(centerId) && isValidId(logId) && isCenterOwner(centerId);
+      }
+    }
+  }
+}

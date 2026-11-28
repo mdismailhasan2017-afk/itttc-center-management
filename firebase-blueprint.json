@@ -1,0 +1,450 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Public profile for an authenticated center operator.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "role": { "type": "string", "enum": ["owner", "staff", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "User Private Info",
+      "description": "Isolated PII record for an authenticated user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "Admin Record",
+      "description": "Authorized super admin registry document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "grantedAt"]
+    },
+    "Center": {
+      "title": "Training Center",
+      "description": "ITTC center workspace configuration and security credentials.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "subtitle": { "type": "string", "maxLength": 400 },
+        "address": { "type": "string", "maxLength": 500 },
+        "phone": { "type": "string", "maxLength": 60 },
+        "slipFooter": { "type": "string", "maxLength": 400 },
+        "accountsPass": { "type": "string", "maxLength": 60 },
+        "generalAccountsPass": { "type": "string", "maxLength": 60 },
+        "adminUser": { "type": "string", "maxLength": 60 },
+        "adminPass": { "type": "string", "maxLength": 60 },
+        "navOrder": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "name", "subtitle", "address", "phone", "slipFooter", "accountsPass", "adminUser", "adminPass", "navOrder", "createdAt", "updatedAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Registered trainee with photo, biometric status, family info, contract, job balance, and overseas status.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 420 },
+        "code": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "fatherName": { "type": "string", "maxLength": 360 },
+        "motherName": { "type": "string", "maxLength": 360 },
+        "phone": { "type": "string", "maxLength": 60 },
+        "guardianPhone": { "type": "string", "maxLength": 60 },
+        "district": { "type": "string", "maxLength": 480 },
+        "nid": { "type": "string", "maxLength": 60 },
+        "trade": { "type": "string", "maxLength": 200 },
+        "passportSubmitted": { "type": "boolean" },
+        "passportNo": { "type": "string", "maxLength": 60 },
+        "passportCopyData": { "type": "string", "maxLength": 150000 },
+        "photoData": { "type": "string", "maxLength": 150000 },
+        "bioEnrolled": { "type": "boolean" },
+        "companyName": { "type": "string", "maxLength": 360 },
+        "interviewPassedCompany": { "type": "string", "maxLength": 420 },
+        "interviewDate": { "type": "string", "maxLength": 60 },
+        "overseasStatus": { "type": "string", "enum": ["Not Applied", "Interview Attended", "Selected", "Visa Processing", "Flight Ready"] },
+        "destination": { "type": "string", "maxLength": 200 },
+        "contract": { "type": "number" },
+        "deposit": { "type": "number" },
+        "note": { "type": "string", "maxLength": 900 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "name", "code", "fatherName", "motherName", "phone", "guardianPhone", "district", "nid", "trade", "passportSubmitted", "passportNo", "passportCopyData", "photoData", "bioEnrolled", "companyName", "interviewPassedCompany", "interviewDate", "overseasStatus", "destination", "contract", "deposit", "note", "createdAt", "updatedAt"]
+    },
+    "JobEntry": {
+      "title": "Daily Job Entry",
+      "description": "Practical test job registered for a student with discount, payable, and verification method.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "no": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sid": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sname": { "type": "string", "minLength": 1, "maxLength": 420 },
+        "cat": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "pay": { "type": "number" },
+        "discount": { "type": "number" },
+        "paid": { "type": "number" },
+        "verificationMethod": { "type": "string", "enum": ["biometric", "supervisor"] },
+        "note": { "type": "string", "maxLength": 750 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "no", "sid", "sname", "cat", "pay", "discount", "paid", "verificationMethod", "note", "createdAt", "updatedAt"]
+    },
+    "OutStudentJob": {
+      "title": "Out of Student Job",
+      "description": "Walk-in / external trainee practical test entry with agent and payment ref.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "no": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 420 },
+        "phone": { "type": "string", "maxLength": 60 },
+        "agent": { "type": "string", "maxLength": 360 },
+        "cat": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "price": { "type": "number" },
+        "paid": { "type": "number" },
+        "paidTo": { "type": "string", "maxLength": 200 },
+        "payRef": { "type": "string", "maxLength": 200 },
+        "note": { "type": "string", "maxLength": 750 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "no", "name", "phone", "agent", "cat", "price", "paid", "paidTo", "payRef", "note", "createdAt", "updatedAt"]
+    },
+    "StaffMember": {
+      "title": "Staff Member",
+      "description": "Center staff profile and monthly salary rate.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "role": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "phone": { "type": "string", "maxLength": 40 },
+        "email": { "type": "string", "maxLength": 140 },
+        "nid": { "type": "string", "maxLength": 40 },
+        "address": { "type": "string", "maxLength": 200 },
+        "joinDate": { "type": "string", "maxLength": 20 },
+        "bio": { "type": "string", "maxLength": 250 },
+        "salary": { "type": "number" },
+        "paid": { "type": "number" },
+        "month": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "name", "role", "phone", "email", "nid", "address", "joinDate", "bio", "salary", "paid", "month", "createdAt", "updatedAt"]
+    },
+    "StaffPayment": {
+      "title": "Staff Payment",
+      "description": "Historical staff salary disbursement entry.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "staffId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "staffName": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "month": { "type": "string", "minLength": 1, "maxLength": 30 },
+        "amount": { "type": "number" },
+        "method": { "type": "string", "maxLength": 40 },
+        "note": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "staffId", "staffName", "month", "amount", "method", "note", "createdAt", "updatedAt"]
+    },
+    "OverseasCompany": {
+      "title": "Overseas Company",
+      "description": "Foreign client / recruitment partner organization.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "country": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "contact": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 40 },
+        "address": { "type": "string", "maxLength": 200 },
+        "demand": { "type": "string", "maxLength": 160 },
+        "contractsCount": { "type": "number" },
+        "workersCount": { "type": "number" },
+        "note": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "name", "country", "contact", "phone", "address", "demand", "contractsCount", "workersCount", "note", "createdAt", "updatedAt"]
+    },
+    "AgencyContract": {
+      "title": "Agency Contract",
+      "description": "Overseas agency hiring history and worker deployment contract.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "companyName": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "country": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "trade": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "workersCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Completed", "Pending"] },
+        "note": { "type": "string", "maxLength": 250 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "companyName", "country", "trade", "workersCount", "status", "note", "createdAt", "updatedAt"]
+    },
+    "StoreItem": {
+      "title": "Store Item",
+      "description": "Raw material inventory item with code, vendor, and stock level.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "code": { "type": "string", "maxLength": 40 },
+        "item": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "category": { "type": "string", "maxLength": 80 },
+        "shop": { "type": "string", "maxLength": 120 },
+        "memo": { "type": "string", "maxLength": 80 },
+        "qty": { "type": "number" },
+        "unit": { "type": "string", "minLength": 1, "maxLength": 30 },
+        "min": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "code", "item", "category", "shop", "memo", "qty", "unit", "min", "createdAt", "updatedAt"]
+    },
+    "StoreLog": {
+      "title": "Store Transaction Log",
+      "description": "Stock IN (Receive) or OUT (Issue) ledger transaction.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "itemId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 40 },
+        "itemName": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "movement": { "type": "string", "enum": ["IN", "OUT"] },
+        "qty": { "type": "number" },
+        "shop": { "type": "string", "maxLength": 120 },
+        "memo": { "type": "string", "maxLength": 80 },
+        "amount": { "type": "number" },
+        "remarks": { "type": "string", "maxLength": 250 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "itemId", "code", "itemName", "movement", "qty", "shop", "memo", "amount", "remarks", "createdAt", "updatedAt"]
+    },
+    "JobPrice": {
+      "title": "Job Price & Quota Limit",
+      "description": "Category fee and max allowed jobs per student.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "cat": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "price": { "type": "number" },
+        "limit": { "type": "number" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "cat", "price", "limit", "active", "createdAt", "updatedAt"]
+    },
+    "JobReturn": {
+      "title": "Job Return / Retrain",
+      "description": "Log of returned, retrained, or reworked practical test jobs.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "no": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "code": { "type": "string", "maxLength": 80 },
+        "sname": { "type": "string", "maxLength": 420 },
+        "cat": { "type": "string", "maxLength": 200 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 750 },
+        "act": { "type": "string", "enum": ["Retrain", "Plate Return", "Failed / Rework"] },
+        "fee": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "no", "code", "sname", "cat", "reason", "act", "fee", "createdAt", "updatedAt"]
+    },
+    "CashEntry": {
+      "title": "Cashbook Entry",
+      "description": "Income or expense voucher in the center cashbook.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "type": { "type": "string", "enum": ["in", "out"] },
+        "category": { "type": "string", "maxLength": 200 },
+        "amt": { "type": "number" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 750 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "type", "category", "amt", "note", "createdAt", "updatedAt"]
+    },
+    "GeneralAccountRow": {
+      "title": "General Account Ledger Row",
+      "description": "Excel-style general accounts row tracking cash income, bank deposits, expenses, and opening balance.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "rowOrder": { "type": "number" },
+        "isOpening": { "type": "boolean" },
+        "date": { "type": "string", "maxLength": 60 },
+        "inDesc": { "type": "string", "maxLength": 600 },
+        "inCash": { "type": "string", "maxLength": 120 },
+        "inBank": { "type": "string", "maxLength": 120 },
+        "outDesc": { "type": "string", "maxLength": 600 },
+        "outCash": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "rowOrder", "isOpening", "date", "inDesc", "inCash", "inBank", "outDesc", "outCash", "createdAt", "updatedAt"]
+    },
+    "DocItem": {
+      "title": "DocuList & Passport Record",
+      "description": "Candidate passport, medical, police clearance, certificate, BMET/visa, and flight tracker.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "code": { "type": "string", "maxLength": 80 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 420 },
+        "docNo": { "type": "string", "maxLength": 120 },
+        "expiry": { "type": "string", "maxLength": 60 },
+        "who": { "type": "string", "minLength": 1, "maxLength": 420 },
+        "trade": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["Original Held", "Copy Submitted", "Pending"] },
+        "medical": { "type": "string", "enum": ["Fit", "Pending", "Unfit"] },
+        "policeClearance": { "type": "string", "enum": ["Received", "Applied", "Pending"] },
+        "certificate": { "type": "string", "enum": ["Issued", "In Progress", "Pending"] },
+        "bmetVisa": { "type": "string", "enum": ["Stamped", "Processing", "Pending"] },
+        "flightStatus": { "type": "string", "enum": ["Scheduled", "Waiting", "Departed"] },
+        "flightDate": { "type": "string", "maxLength": 60 },
+        "agencyCountry": { "type": "string", "maxLength": 420 },
+        "note": { "type": "string", "maxLength": 750 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "code", "title", "docNo", "expiry", "who", "trade", "phone", "status", "medical", "policeClearance", "certificate", "bmetVisa", "flightStatus", "flightDate", "agencyCountry", "note", "createdAt", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Activity trail for administrative and operational actions.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "time": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "action": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "module": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 750 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "date", "time", "action", "module", "detail", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Public profile for authenticated operator."
+    },
+    "/users/{userId}/private/info": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Isolated PII email storage for user."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Super admin registry."
+    },
+    "/centers/{centerId}": {
+      "schema": { "$ref": "#/entities/Center" },
+      "description": "ITTC center root workspace document."
+    },
+    "/centers/{centerId}/students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Registered trainee records."
+    },
+    "/centers/{centerId}/jobs/{jobId}": {
+      "schema": { "$ref": "#/entities/JobEntry" },
+      "description": "Daily practical test jobs."
+    },
+    "/centers/{centerId}/outs/{outId}": {
+      "schema": { "$ref": "#/entities/OutStudentJob" },
+      "description": "External trainee test jobs."
+    },
+    "/centers/{centerId}/staff/{staffId}": {
+      "schema": { "$ref": "#/entities/StaffMember" },
+      "description": "Staff and payroll records."
+    },
+    "/centers/{centerId}/staffPayments/{paymentId}": {
+      "schema": { "$ref": "#/entities/StaffPayment" },
+      "description": "Staff salary payment history."
+    },
+    "/centers/{centerId}/companies/{companyId}": {
+      "schema": { "$ref": "#/entities/OverseasCompany" },
+      "description": "Overseas company partner directory."
+    },
+    "/centers/{centerId}/agencyContracts/{contractId}": {
+      "schema": { "$ref": "#/entities/AgencyContract" },
+      "description": "Overseas agency contract history."
+    },
+    "/centers/{centerId}/store/{itemId}": {
+      "schema": { "$ref": "#/entities/StoreItem" },
+      "description": "Store inventory and stock thresholds."
+    },
+    "/centers/{centerId}/storeLogs/{logId}": {
+      "schema": { "$ref": "#/entities/StoreLog" },
+      "description": "Store IN/OUT stock ledger transactions."
+    },
+    "/centers/{centerId}/prices/{priceId}": {
+      "schema": { "$ref": "#/entities/JobPrice" },
+      "description": "Practical test category pricing and quota limits."
+    },
+    "/centers/{centerId}/returns/{returnId}": {
+      "schema": { "$ref": "#/entities/JobReturn" },
+      "description": "Returned or retrained jobs."
+    },
+    "/centers/{centerId}/cash/{cashId}": {
+      "schema": { "$ref": "#/entities/CashEntry" },
+      "description": "Center accounts and cashbook entries."
+    },
+    "/centers/{centerId}/generalAccounts/{rowId}": {
+      "schema": { "$ref": "#/entities/GeneralAccountRow" },
+      "description": "General accounts spreadsheet rows with cash income, bank deposit, and expense tracking."
+    },
+    "/centers/{centerId}/docs/{docId}": {
+      "schema": { "$ref": "#/entities/DocItem" },
+      "description": "DocuList and passport verification tracker."
+    },
+    "/centers/{centerId}/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Super Admin activity audit trail."
+    }
+  }
+}

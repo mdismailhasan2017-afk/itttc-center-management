@@ -1,0 +1,6 @@
+{
+  "name": "ITTC Center – Management System",
+  "description": "Ideal Technical Training & Testing Center practical test, student ledger, daily job register, payroll, inventory, and cashbook management system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

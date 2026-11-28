@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GENERAL ACCOUNTS - ITTC Center</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "SolaimanLipi", "Nikosh", "Segoe UI", Tahoma, sans-serif;
+    }
+
+    :root {
+      --bg: #040d0c;
+      --sidebar: #071412;
+      --panel: #091b18;
+      --card: #0a1f1c;
+      --border: #17493d;
+      --accent: #10b981;
+      --accent-soft: rgba(16, 185, 129, 0.16);
+      --pink: #ec4899;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --orange: #f97316;
+      --red: #dc2626;
+      --text: #f1f5f9;
+      --muted: #8ea8a1;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Password Lock Screen */
+    .lock-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle at top, #0d2e28 0%, #040d0c 70%);
+    }
+
+    .lock-card {
+      width: 100%;
+      max-width: 390px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .lock-badge {
+      display: inline-block;
+      width: fit-content;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .lock-card h1 { font-size: 18px; }
+    .lock-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .lock-input {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .lock-input:focus { border-color: var(--accent); }
+    .lock-error { color: #f87171; font-size: 12px; min-height: 16px; }
+
+    /* App Shell */
+    .app-shell { display: none; min-height: 100vh; }
+    .app-shell.unlocked { display: grid; grid-template-columns: 225px 1fr; }
+
+    .sidebar {
+      background: var(--sidebar);
+      border-right: 1.5px solid var(--border);
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 12px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .brand-title { font-size: 13px; font-weight: 700; }
+    .brand-sub { font-size: 10.5px; color: var(--muted); }
+
+    .nav-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+
+    .nav-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover { background: var(--panel); color: var(--text); }
+    .nav-btn.active { background: var(--accent); color: #04100c; font-weight: 700; }
+
+    .main-content { display: flex; flex-direction: column; min-width: 0; }
+
+    .topbar {
+      background: var(--sidebar);
+      border-bottom: 1.5px solid var(--border);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .topbar-left h2 { font-size: 15px; font-weight: 700; }
+    .topbar-left span { font-size: 11px; color: var(--muted); }
+    .topbar-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      background: var(--accent);
+      color: #04100c;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-pink { background: var(--pink); color: #ffffff; }
+    .btn-blue { background: #2563eb; color: #ffffff; }
+    .btn-red { background: var(--red); color: #ffffff; }
+    .btn-secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+
+    .page-body {
+      padding: 14px 18px 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-pane { display: none; flex-direction: column; gap: 12px; }
+    .tab-pane.active { display: flex; }
+
+    /* Dashboard Styles */
+    .top-strip {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) 230px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .strip-kpi {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2px;
+      border-right: 1px solid rgba(23, 73, 61, 0.7);
+      padding-right: 8px;
+    }
+
+    .strip-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .strip-val { font-size: 17px; font-weight: 700; }
+    .strip-sub { font-size: 10.5px; color: var(--muted); }
+
+    .date-box { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .date-box-title { font-size: 11.5px; font-weight: 700; color: var(--text); }
+    .date-pill-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+
+    .date-pill {
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .date-pill.active { background: var(--accent); color: #04100c; border-color: var(--accent); }
+
+    .opening-bar {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .opening-title { font-size: 12.5px; font-weight: 700; color: var(--accent); }
+    .opening-inputs { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .opening-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .opening-field input {
+      width: 110px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .bi-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+    }
+
+    .bi-title {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .kpi-value { font-size: 19px; font-weight: 700; }
+    .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .income-text { color: #34d399; }
+    .expense-text { color: #f472b6; }
+    .blue-text { color: #60a5fa; }
+    .purple-text { color: #a78bfa; }
+    .orange-text { color: #fb923c; }
+
+    .officials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    .official-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .official-role { font-size: 10.5px; font-weight: 700; color: var(--muted); text-align: center; }
+    .official-name { font-size: 14.5px; font-weight: 700; text-align: center; }
+    .official-amount { font-size: 21px; font-weight: 700; text-align: center; }
+
+    .graph-box {
+      background: var(--panel);
+      border: 1px solid rgba(23, 73, 61, 0.8);
+      border-radius: 8px;
+      padding: 12px 10px 8px 10px;
+      height: 165px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+    .bar-fill { width: 100%; max-width: 34px; border-radius: 4px 4px 0 0; min-height: 4px; }
+    .bar-val { font-size: 10px; font-weight: 700; }
+    .bar-lbl { font-size: 9.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .h-bar-list { display: flex; flex-direction: column; gap: 8px; }
+    .h-bar-item { display: grid; grid-template-columns: 145px 1fr auto; gap: 8px; align-items: center; font-size: 11.5px; }
+    .h-bar-label { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .h-bar-track { height: 14px; background: var(--panel); border-radius: 3px; overflow: hidden; }
+    .h-bar-fill { height: 100%; background: var(--pink); }
+
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .summary-table th, .summary-table td { padding: 8px 8px; border-bottom: 1px solid rgba(23, 73, 61, 0.65); text-align: left; }
+    .summary-table th { color: var(--muted); font-size: 11px; }
+
+    /* Transaction Entry Panel */
+    .tx-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .tx-kpi-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .tx-kpi-title { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .tx-kpi-main { font-size: 19px; font-weight: 700; }
+    .tx-kpi-sub { font-size: 10.5px; color: var(--muted); }
+
+    .entry-box {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .entry-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(23, 73, 61, 0.7);
+    }
+
+    .date-stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .step-btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .date-input-inline {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      width: 115px;
+      outline: none;
+    }
+
+    .mode-switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mode-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .mode-btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-btn.active-income { background: #16a34a; color: #ffffff; border-color: #16a34a; }
+    .mode-btn.active-expense { background: #dc2626; color: #ffffff; border-color: #dc2626; }
+    .mode-btn.active-bank { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+
+    .quick-select-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .preset-chip {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 9px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .preset-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .entry-inputs-grid {
+      display: grid;
+      grid-template-columns: 125px 150px 180px 1fr 130px auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .e-field { display: flex; flex-direction: column; gap: 4px; }
+    .e-field label { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+    .e-field input,
+    .e-field select {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      outline: none;
+    }
+
+    .e-field input:focus,
+    .e-field select:focus { border-color: var(--accent); }
+
+    .sheet-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .filter-group input,
+    .filter-group select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* Reference Image Sheet Style */
+    .excel-container {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #1d4ed8;
+      padding: 6px;
+      overflow-x: auto;
+      border-radius: 4px;
+    }
+
+    .sheet-banner-green {
+      background: #00b050;
+      color: #000000;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border: 1px solid #000000;
+    }
+
+    .sheet-banner-yellow {
+      background: #ffff00;
+      color: #000000;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border: 1px solid #000000;
+      border-top: none;
+    }
+
+    table.excel-table {
+      width: 100%;
+      min-width: 1080px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 11px;
+      color: #000000;
+    }
+
+    table.excel-table th,
+    table.excel-table td {
+      border: 1px solid #000000;
+      padding: 2px 4px;
+      height: 21px;
+      vertical-align: middle;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .hdr-peach {
+      background-color: #f4b084;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .bg-green {
+      background-color: #00b050 !important;
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .bg-yellow {
+      background-color: #ffff00 !important;
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .bold { font-weight: 700; }
+
+    td[contenteditable="true"]:focus {
+      outline: 2px solid #16a34a;
+      background-color: #f0fdf4;
+    }
+
+    .action-links {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .link-receipt {
+      color: #059669;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .link-delete {
+      color: #dc2626;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .sheet-footer-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1200px) {
+      .entry-inputs-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 1150px) {
+      .top-strip { grid-template-columns: repeat(2, 1fr); }
+      .date-box { grid-column: 1 / -1; }
+      .strip-kpi { border-right: none; padding-right: 0; }
+      .tx-kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell.unlocked { grid-template-columns: 1fr; }
+      .officials-grid, .kpi-grid-4, .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 6mm;
+    }
+
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+      .lock-screen, .sidebar, .topbar, #dashboardPane, .entry-box, .tx-kpi-row, .sheet-controls, .sheet-footer-note, .no-print {
+        display: none !important;
+      }
+      .app-shell.unlocked, .main-content, .page-body, #sheetPane, .bi-card {
+        display: block !important;
+        background: #ffffff !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .excel-container { border: 1.5px solid #000000 !important; padding: 4px !important; overflow: visible !important; }
+      table.excel-table { min-width: 100% !important; font-size: 9.5px !important; }
+      table.excel-table th, table.excel-table td {
+        height: 18px !important;
+        padding: 2px 4px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GENERAL ACCOUNTS পাসওয়ার্ড লক স্ক্রিন -->
+  <div class="lock-screen" id="lockScreen">
+    <form class="lock-card" id="unlockForm">
+      <span class="lock-badge">PROTECTED MODULE</span>
+      <h1>GENERAL ACCOUNTS</h1>
+      <p>IDEAL TECHNICAL TRAINING &amp; TESTING CENTER — হিসাব বিভাগে প্রবেশ করতে পাসওয়ার্ড দিন (ডিফল্ট পাসওয়ার্ড: <strong>1234</strong>)</p>
+      <input type="password" class="lock-input" id="passwordInput" placeholder="পাসওয়ার্ড লিখুন..." required autofocus />
+      <div class="lock-error" id="lockError"></div>
+      <button type="submit" class="btn">🔓 লগইন করে প্রবেশ করুন</button>
+    </form>
+  </div>
+
+  <!-- লগইন করার পর GENERAL ACCOUNTS -->
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand-box">
+          <div class="brand-logo">GA</div>
+          <div>
+            <div class="brand-title">GENERAL ACCOUNTS</div>
+            <div class="brand-sub">ITTC Center • Accounts Only</div>
+          </div>
+        </div>
+
+        <div class="nav-list">
+          <button type="button" class="nav-btn active" data-pane="dashboardPane">
+            <span>📊 হিসাব সামারি (Dashboard)</span>
+          </button>
+          <button type="button" class="nav-btn" data-pane="sheetPane">
+            <span>📑 নতুন হিসাব লেনদেন</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-secondary" id="lockBtn">🔒 Lock Accounts</button>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2>IDEAL TECHNICAL TRAINING &amp; TESTING CENTER</h2>
+          <span>GENERAL ACCOUNTS • হিসাব লেনদেন ও সামারি</span>
+        </div>
+
+        <div class="topbar-right">
+          <button type="button" class="btn btn-blue" id="exportJsonBtn">💾 Backup</button>
+          <button type="button" class="btn btn-secondary" id="importJsonBtn">📂 Restore</button>
+          <input type="file" id="jsonFileInput" accept="application/json" style="display:none;" />
+          <button type="button" class="btn" id="topExportXlsxBtn">📊 Download XL (.xlsx)</button>
+          <button type="button" class="btn btn-pink" id="printPdfBtn">📄 Download PDF</button>
+        </div>
+      </header>
+
+      <div class="page-body">
+        <!-- ট্যাব ১: হিসাব সামারি ড্যাশবোর্ড -->
+        <section class="tab-pane active" id="dashboardPane">
+          <div class="top-strip">
+            <div class="strip-kpi">
+              <span class="strip-label">মোট নগদ টাকা</span>
+              <span class="strip-val income-text" id="cardTotalCash">৳২৭৯৮২৩</span>
+              <span class="strip-sub" id="subCashBreakdown">পূর্বের: ৳২১৫৪২৩ + নতুন: ৳৬৪৪০০</span>
+            </div>
+            <div class="strip-kpi">
+              <span class="strip-label">মোট ব্যয়ের টাকা</span>
+              <span class="strip-val expense-text" id="cardTotalExpense">৳২৫১৩১০</span>
+              <span class="strip-sub">ব্যাংক জমা ও সকল খরচসহ</span>
+            </div>
+            <div class="strip-kpi">
+              <span class="strip-label">ব্যাংক ও Bkash জমা</span>
+              <span class="strip-val blue-text" id="cardTotalBank">৳৭৬৭৫৭০</span>
+              <span class="strip-sub" id="subBankBreakdown">ব্যাংক ও বিকাশ ব্যালেন্স</span>
+            </div>
+            <div class="strip-kpi" style="border-right:none;">
+              <span class="strip-label">নগদ ব্যালেন্স / (নগদ + ব্যাংক)</span>
+              <span class="strip-val" id="cardNetBalance">৳২৮৫১৩ / ৳৭৯৬০৮৩</span>
+              <span class="strip-sub">হাতে নগদ ও সর্বমোট ব্যালেন্স</span>
+            </div>
+            <div class="date-box">
+              <span class="date-box-title">তারিখ সিলেক্ট করুন</span>
+              <div class="date-pill-group" id="datePillGroup"></div>
+            </div>
+          </div>
+
+          <!-- পূর্বের ব্যালেন্স সেট ও এডিট করার অপশন -->
+          <div class="opening-bar">
+            <div class="opening-title">📌 পূর্বের ব্যালেন্স (Opening Balance)</div>
+            <div class="opening-inputs">
+              <div class="opening-field">
+                <span>তারিখ:</span>
+                <input type="text" id="openingDateInput" value="21.11.2026" style="width:100px;" />
+              </div>
+              <div class="opening-field">
+                <span>Cash:</span>
+                <input type="number" id="openingCashInput" value="215423" />
+              </div>
+              <div class="opening-field">
+                <span>Bank:</span>
+                <input type="number" id="openingBankInput" value="543570" />
+              </div>
+              <div class="opening-field">
+                <span>Bkash:</span>
+                <input type="number" id="openingBkashInput" value="0" />
+              </div>
+              <button type="button" class="btn" id="saveOpeningBtn">সংরক্ষণ</button>
+            </div>
+          </div>
+
+          <!-- ৪টি দৈনিক Purpose জমা কার্ড -->
+          <div class="kpi-grid-4">
+            <div class="bi-card">
+              <div class="kpi-label">১. Welding Job Fee জমা</div>
+              <div class="kpi-value blue-text" id="weldingJobFeeVal">৳০</div>
+              <div class="kpi-sub">For The Purpose Of Welding Job Fee</div>
+            </div>
+            <div class="bi-card">
+              <div class="kpi-label">২. Fitter Fee জমা</div>
+              <div class="kpi-value purple-text" id="fitterFeeVal">৳০</div>
+              <div class="kpi-sub">For The Purpose Of Fitter Fee</div>
+            </div>
+            <div class="bi-card">
+              <div class="kpi-label">৩. Visa Fee জমা</div>
+              <div class="kpi-value orange-text" id="visaFeeVal">৳০</div>
+              <div class="kpi-sub">For The Purpose Of Visa Fee</div>
+            </div>
+            <div class="bi-card">
+              <div class="kpi-label">৪. P.P.E জমা</div>
+              <div class="kpi-value income-text" id="ppeFeeVal">৳০</div>
+              <div class="kpi-sub">For The Purpose Of P.P.E</div>
+            </div>
+          </div>
+
+          <!-- ৩ জন কর্মকর্তার হিসাব ও আলাদা আলাদা গ্রাফ -->
+          <div class="officials-grid">
+            <div class="official-card">
+              <div class="official-role">MANAGING DIRECTOR</div>
+              <div class="official-name" style="color:var(--orange);">SABUJ KAZI</div>
+              <div class="official-amount expense-text" id="mdTotalVal">৳০</div>
+              <div class="graph-box" id="mdGraph"></div>
+            </div>
+
+            <div class="official-card">
+              <div class="official-role">DIRECTOR</div>
+              <div class="official-name" style="color:#60a5fa;">SOHEL KAZI</div>
+              <div class="official-amount expense-text" id="dirTotalVal">৳০</div>
+              <div class="graph-box" id="dirGraph"></div>
+            </div>
+
+            <div class="official-card">
+              <div class="official-role">GENERAL MANAGER</div>
+              <div class="official-name" style="color:#c084fc;">SALIM MAHMMUD</div>
+              <div class="official-amount expense-text" id="gmTotalVal">৳০</div>
+              <div class="graph-box" id="gmGraph"></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="bi-card">
+              <div class="bi-title">খাত অনুযায়ী ব্যয়ের ব্রেকডাউন (Expenses by Category)</div>
+              <div class="h-bar-list" id="expenseCategoryBars"></div>
+            </div>
+
+            <div class="bi-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
+                <div class="bi-title" style="margin-bottom:0; text-align:left;">দৈনিক Purpose সামারি</div>
+                <button type="button" class="btn" onclick="switchPane('sheetPane')">📑 নতুন হিসাব লেনদেনে যান →</button>
+              </div>
+              <table class="summary-table">
+                <thead>
+                  <tr>
+                    <th>তারিখ</th>
+                    <th>Welding Job</th>
+                    <th>Fitter Fee</th>
+                    <th>Visa Fee</th>
+                    <th>P.P.E</th>
+                  </tr>
+                </thead>
+                <tbody id="dailyCategorySummaryBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ট্যাব ২: নতুন হিসাব লেনদেন -->
+        <section class="tab-pane" id="sheetPane">
+          <!-- ৪টি টপ সামারি কার্ড -->
+          <div class="tx-kpi-row">
+            <div class="tx-kpi-card">
+              <span class="tx-kpi-title">Opening (Cash + Bank + Bkash)</span>
+              <span class="tx-kpi-main" id="txOpeningTotal">৳ 758,993</span>
+              <span class="tx-kpi-sub" id="txOpeningSub">Cash ৳215,423 • Bank ৳543,570 • Bkash ৳0</span>
+            </div>
+            <div class="tx-kpi-card">
+              <span class="tx-kpi-title">Today's Cash In</span>
+              <span class="tx-kpi-main income-text" id="txTodayIn">+৳ 0</span>
+              <span class="tx-kpi-sub" id="txTodayCount">0 entries today</span>
+            </div>
+            <div class="tx-kpi-card">
+              <span class="tx-kpi-title">Today's Expense</span>
+              <span class="tx-kpi-main expense-text" id="txTodayExpense">-৳ 0</span>
+              <span class="tx-kpi-sub" id="txBankNetSub">Bank/Bkash জমা +৳0</span>
+            </div>
+            <div class="tx-kpi-card">
+              <span class="tx-kpi-title">Closing Balance</span>
+              <span class="tx-kpi-main blue-text" id="txClosingTotal">৳ 758,993</span>
+              <span class="tx-kpi-sub" id="txClosingCashSub">হাতে নগদ ৳215,423</span>
+            </div>
+          </div>
+
+          <!-- নতুন হিসাব লেনদেন এন্ট্রি বক্স -->
+          <div class="entry-box">
+            <div class="entry-top-bar">
+              <div class="date-stepper">
+                <button type="button" class="step-btn" id="prevDateBtn">‹</button>
+                <input type="text" class="date-input-inline" id="activeTxDate" value="22.11.2026" />
+                <button type="button" class="step-btn" id="nextDateBtn">›</button>
+                <span style="font-size:12px; color:var(--muted); margin-left:6px;" id="dayNameLabel">রবিবার • Auto carry-forward</span>
+              </div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary" id="lockDayBtn">🔓 Day Unlocked</button>
+                <button type="button" class="btn" id="exportXlsxBtn">📊 Export Excel (.xlsx)</button>
+                <button type="button" class="btn btn-blue" id="sheetPrintBtn">🖨 Print / PDF</button>
+              </div>
+            </div>
+
+            <div class="mode-switch-row">
+              <div class="mode-btns">
+                <button type="button" class="mode-btn" id="modeIncomeBtn">⊕ Income (+)</button>
+                <button type="button" class="mode-btn active-expense" id="modeExpenseBtn">⊖ Expense (-)</button>
+                <button type="button" class="mode-btn" id="modeBankBtn">⇄ Bank / Bkash Transfer</button>
+              </div>
+              <span style="font-size:11px; color:var(--muted);">Account: Bank, Bkash, Cash • Voucher: ME.NO-4599</span>
+            </div>
+
+            <div class="quick-select-bar">
+              <strong style="color:var(--text);">For The Purpose Of:</strong>
+              <button type="button" class="preset-chip" onclick="applyPurpose('Welding Job Fee', 'income')">Welding Job Fee</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('Fitter Fee', 'income')">Fitter Fee</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('Visa Fee', 'income')">Visa Fee</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('P.P.E', 'income')">P.P.E</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('অপারেশন খরচ', 'expense')">অপারেশন খরচ</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('যাতায়াত ভাড়া', 'expense')">যাতায়াত ভাড়া</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('SABUJ KAZI বাবদ খরচ', 'expense')">SABUJ KAZI</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('SOHEL KAZI বাবদ খরচ', 'expense')">SOHEL KAZI</button>
+              <button type="button" class="preset-chip" onclick="applyPurpose('SALIM MAHMMUD বাবদ খরচ', 'expense')">SALIM MAHMMUD</button>
+            </div>
+
+            <form class="entry-inputs-grid" id="quickTxForm">
+              <div class="e-field">
+                <label for="txAccount">Account</label>
+                <select id="txAccount">
+                  <option value="Bank">Bank</option>
+                  <option value="Bkash">Bkash</option>
+                  <option value="Cash" selected>Cash</option>
+                </select>
+              </div>
+
+              <div class="e-field">
+                <label for="txVoucher">Voucher No</label>
+                <input type="text" id="txVoucher" value="ME.NO-4599" placeholder="ME.NO-4599" />
+              </div>
+
+              <div class="e-field">
+                <label for="txPurpose">For The Purpose Of</label>
+                <select id="txPurpose" onchange="onPurposeSelectChange()">
+                  <option value="">-- খাত নির্বাচন করুন --</option>
+                  <option value="Welding Job Fee">Welding Job Fee</option>
+                  <option value="Fitter Fee">Fitter Fee</option>
+                  <option value="Visa Fee">Visa Fee</option>
+                  <option value="P.P.E">P.P.E</option>
+                  <option value="অন্যান্য">অন্যান্য (নিচে লিখুন)</option>
+                </select>
+              </div>
+
+              <div class="e-field">
+                <label id="txDescLabel" for="txDesc">Description / Details</label>
+                <input type="text" id="txDesc" placeholder="যেমন: For The Purpose Of Welding Job Fee" required />
+              </div>
+
+              <div class="e-field">
+                <label for="txAmount">Amount (৳)</label>
+                <input type="number" id="txAmount" min="1" step="any" placeholder="0" required />
+              </div>
+
+              <button type="submit" class="btn btn-red" id="txSubmitBtn" style="padding:8px 16px; height:35px;">+ Add</button>
+            </form>
+          </div>
+
+          <!-- দৈনিক আয় ব্যয়ের হিসাব শীট -->
+          <div class="bi-card">
+            <div class="sheet-controls">
+              <div class="filter-group">
+                <input type="text" id="searchInput" placeholder="ভাউচার বা বিবরণ খুঁজুন..." />
+                <select id="filterMode">
+                  <option value="all">সব সারি দেখুন</option>
+                  <option value="income">শুধু আয়ের সারি</option>
+                  <option value="expense">শুধু ব্যয়ের সারি</option>
+                </select>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn" id="addBlankRowBtn">+ খালি সারি</button>
+                <button type="button" class="btn btn-secondary" id="resetSampleBtn">Demo রিসেট</button>
+              </div>
+            </div>
+
+            <div class="excel-container">
+              <div class="sheet-banner-green">আইডিয়াল টেকনিক্যাল ট্রেনিং এন্ড টেস্টিং সেন্টার</div>
+              <div class="sheet-banner-yellow" id="sheetSubBanner">দৈনিক আয় ব্যয়ের হিসাব ২২/১১/২০২৬ (রবিবার)</div>
+
+              <table class="excel-table" id="excelTable">
+                <colgroup>
+                  <col style="width: 72px;" />
+                  <col style="width: 190px;" />
+                  <col style="width: 70px;" />
+                  <col style="width: 74px;" />
+                  <col style="width: 185px;" />
+                  <col style="width: 70px;" />
+                  <col style="width: 70px;" />
+                  <col style="width: 70px;" />
+                  <col style="width: 74px;" />
+                  <col style="width: 76px;" />
+                  <col style="width: 84px;" />
+                  <col class="no-print" style="width: 72px;" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th rowspan="2" class="hdr-peach">তারিখ</th>
+                    <th colspan="3" class="hdr-peach">আয়</th>
+                    <th colspan="2" class="hdr-peach">ব্যয়</th>
+                    <th rowspan="2" class="hdr-peach">নগদ টাকা</th>
+                    <th rowspan="2" class="hdr-peach">ব্যয়ের টাকা</th>
+                    <th rowspan="2" class="hdr-peach">ব্যাংক/বিকাশ</th>
+                    <th rowspan="2" class="hdr-peach">নগদ ব্যালেন্স</th>
+                    <th rowspan="2" class="hdr-peach">নগদ + ব্যাংক</th>
+                    <th rowspan="2" class="hdr-peach no-print">অ্যাকশন</th>
+                  </tr>
+                  <tr>
+                    <th class="hdr-peach">আয়ের মাধ্যম / ভাউচার</th>
+                    <th class="hdr-peach">নগদ টাকা</th>
+                    <th class="hdr-peach">ব্যাংক/বিকাশ</th>
+                    <th class="hdr-peach">ব্যয়ের মাধ্যম</th>
+                    <th class="hdr-peach">ব্যয়ের টাকা</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerBody"></tbody>
+                <tfoot id="ledgerFooter"></tfoot>
+              </table>
+            </div>
+
+            <div class="sheet-footer-note">
+              <span>* টেবিলের যেকোনো সেলে সরাসরি ক্লিক করে এডিট করা যাবে।</span>
+              <span>Accounts: Bank, Bkash, Cash • Auto-saved</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'ittc_general_accounts_purpose_v2';
+    const PASS_CODE = '1234';
+    const banglaDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+    const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+
+    let entryMode = 'expense'; // 'income' | 'expense' | 'bank'
+
+    function toBn(val) {
+      return String(val).replace(/\d/g, d => banglaDigits[d]);
+    }
+
+    function parseDotDate(dotStr) {
+      const parts = (dotStr || '').trim().split('.');
+      if (parts.length !== 3) return null;
+      const d = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const y = parseInt(parts[2], 10);
+      const dt = new Date(y, m, d);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    function formatDotDate(dt) {
+      const d = String(dt.getDate()).padStart(2, '0');
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const y = dt.getFullYear();
+      return `${d}.${m}.${y}`;
+    }
+
+    function getDayNameFromDot(dotStr) {
+      const dt = parseDotDate(dotStr);
+      return dt ? banglaDays[dt.getDay()] : 'রবিবার';
+    }
+
+    function getPrevDotDate(dotStr) {
+      const dt = parseDotDate(dotStr);
+      if (!dt) return '21.11.2026';
+      dt.setDate(dt.getDate() - 1);
+      return formatDotDate(dt);
+    }
+
+    function getNextVoucherSuggestion() {
+      let maxNum = 4598;
+      state.rows.forEach(r => {
+        const m = (r.voucher || '').match(/(\d+)$/);
+        if (m) {
+          const n = parseInt(m[1], 10);
+          if (n > maxNum) maxNum = n;
+        }
+      });
+      return `ME.NO-${maxNum + 1}`;
+    }
+
+    function defaultState() {
+      return {
+        activeDate: '22.11.2026',
+        lockedDates: {},
+        manualOpenings: {
+          '22.11.2026': { prevDate: '21.11.2026', cash: 215423, bank: 543570, bkash: 0 }
+        },
+        rows: [
+          { id: 'r1', date: '22.11.2026', voucher: 'ME.NO-4582', account: 'Cash', incSrc: 'For The Purpose Of Welding Job Fee', incCash: 10000, incBank: 0, expSrc: '', expAmt: 0 },
+          { id: 'r2', date: '22.11.2026', voucher: 'ME.NO-4583', account: 'Cash', incSrc: 'For The Purpose Of P.P.E', incCash: 4000, incBank: 0, expSrc: 'SABUJ KAZI আপ্যায়ন খরচ', expAmt: 100 },
+          { id: 'r3', date: '22.11.2026', voucher: 'ME.NO-4584', account: 'Cash', incSrc: 'For The Purpose Of Fitter Fee', incCash: 11400, incBank: 0, expSrc: 'SOHEL KAZI সার্টিফিকেট প্রিন্টিং খরচ', expAmt: 5400 },
+          { id: 'r4', date: '22.11.2026', voucher: 'ME.NO-4585', account: 'Cash', incSrc: 'For The Purpose Of Visa Fee', incCash: 10000, incBank: 0, expSrc: 'SALIM MAHMMUD যাতায়াত ভাড়া', expAmt: 200 },
+          { id: 'r5', date: '22.11.2026', voucher: 'ME.NO-4586', account: 'Bkash', incSrc: 'For The Purpose Of Welding Job Fee', incCash: 0, incBank: 15000, expSrc: 'অফিস স্টেশনারি খরচ', expAmt: 1110 },
+          { id: 'r6', date: '22.11.2026', voucher: 'ME.NO-4587', account: 'Bank', incSrc: 'For The Purpose Of Visa Fee', incCash: 10000, incBank: 224000, expSrc: 'ব্যাংকে জমা', expAmt: 224000 }
+        ]
+      };
+    }
+
+    let state = defaultState();
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.rows)) {
+            state = parsed;
+          }
+        } catch (e) { console.error(e); }
+      }
+      document.getElementById('txVoucher').value = getNextVoucherSuggestion();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // Password Lock
+    document.getElementById('unlockForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const val = document.getElementById('passwordInput').value.trim();
+      if (val === PASS_CODE) {
+        document.getElementById('lockScreen').style.display = 'none';
+        document.getElementById('appShell').classList.add('unlocked');
+        renderAll();
+      } else {
+        document.getElementById('lockError').textContent = 'ভুল পাসওয়ার্ড! ডিফল্ট পাসওয়ার্ড: 1234';
+      }
+    });
+
+    document.getElementById('lockBtn').addEventListener('click', function() {
+      document.getElementById('appShell').classList.remove('unlocked');
+      document.getElementById('lockScreen').style.display = 'flex';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('lockError').textContent = '';
+    });
+
+    // Sidebar Navigation
+    function switchPane(paneId) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(paneId).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.pane === paneId);
+      });
+      renderAll();
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchPane(btn.dataset.pane));
+    });
+
+    // Balance & Carry-forward Engine
+    function getDaySummary(dotDate) {
+      const opening = getOpening(dotDate);
+      const dayRows = state.rows.filter(r => r.date === dotDate);
+      let newCashIn = 0;
+      let newBankBkashIn = 0;
+      let totalExp = 0;
+
+      dayRows.forEach(r => {
+        newCashIn += Number(r.incCash) || 0;
+        newBankBkashIn += Number(r.incBank) || 0;
+        totalExp += Number(r.expAmt) || 0;
+      });
+
+      const openCash = Number(opening.cash) || 0;
+      const openBankBkash = (Number(opening.bank) || 0) + (Number(opening.bkash) || 0);
+
+      const totalCash = openCash + newCashIn;
+      const totalBank = openBankBkash + newBankBkashIn;
+      const cashBalance = totalCash - totalExp;
+      const grandTotal = cashBalance + totalBank;
+
+      return { opening, dayRows, newCashIn, newBankBkashIn, totalCash, totalBank, totalExp, cashBalance, grandTotal };
+    }
+
+    function getOpening(dotDate) {
+      if (state.manualOpenings && state.manualOpenings[dotDate]) {
+        return state.manualOpenings[dotDate];
+      }
+      const prevStr = getPrevDotDate(dotDate);
+      const hasPrev = state.rows.some(r => r.date === prevStr) || (state.manualOpenings && state.manualOpenings[prevStr]);
+      if (hasPrev) {
+        const prevSum = getDaySummary(prevStr);
+        return { prevDate: prevStr, cash: prevSum.cashBalance, bank: prevSum.totalBank, bkash: 0 };
+      }
+      return { prevDate: prevStr, cash: 0, bank: 0, bkash: 0 };
+    }
+
+    // Mode Switching
+    function setEntryMode(mode) {
+      entryMode = mode;
+      const incBtn = document.getElementById('modeIncomeBtn');
+      const expBtn = document.getElementById('modeExpenseBtn');
+      const bnkBtn = document.getElementById('modeBankBtn');
+      const descLbl = document.getElementById('txDescLabel');
+      const subBtn = document.getElementById('txSubmitBtn');
+
+      incBtn.className = 'mode-btn';
+      expBtn.className = 'mode-btn';
+      bnkBtn.className = 'mode-btn';
+
+      if (mode === 'income') {
+        incBtn.classList.add('active-income');
+        descLbl.textContent = 'Income Description';
+        subBtn.className = 'btn';
+      } else if (mode === 'expense') {
+        expBtn.classList.add('active-expense');
+        descLbl.textContent = 'Expense Description';
+        subBtn.className = 'btn btn-red';
+      } else {
+        bnkBtn.classList.add('active-bank');
+        descLbl.textContent = 'Bank / Bkash Transfer Note';
+        subBtn.className = 'btn btn-blue';
+      }
+    }
+
+    document.getElementById('modeIncomeBtn').addEventListener('click', () => setEntryMode('income'));
+    document.getElementById('modeExpenseBtn').addEventListener('click', () => setEntryMode('expense'));
+    document.getElementById('modeBankBtn').addEventListener('click', () => setEntryMode('bank'));
+
+    function onPurposeSelectChange() {
+      const p = document.getElementById('txPurpose').value;
+      if (p && p !== 'অন্যান্য') {
+        document.getElementById('txDesc').value = `For The Purpose Of ${p}`;
+        setEntryMode('income');
+      }
+    }
+
+    function applyPurpose(text, mode) {
+      const purposeList = ['Welding Job Fee', 'Fitter Fee', 'Visa Fee', 'P.P.E'];
+      if (purposeList.includes(text)) {
+        document.getElementById('txPurpose').value = text;
+        document.getElementById('txDesc').value = `For The Purpose Of ${text}`;
+      } else {
+        document.getElementById('txDesc').value = text;
+      }
+      setEntryMode(mode);
+      document.getElementById('txAmount').focus();
+    }
+
+    // Date Controls
+    function changeActiveDate(newDotDate) {
+      state.activeDate = newDotDate;
+      saveState();
+      renderAll();
+    }
+
+    document.getElementById('prevDateBtn').addEventListener('click', () => {
+      const dt = parseDotDate(state.activeDate);
+      if (!dt) return;
+      dt.setDate(dt.getDate() - 1);
+      changeActiveDate(formatDotDate(dt));
+    });
+
+    document.getElementById('nextDateBtn').addEventListener('click', () => {
+      const dt = parseDotDate(state.activeDate);
+      if (!dt) return;
+      dt.setDate(dt.getDate() + 1);
+      changeActiveDate(formatDotDate(dt));
+    });
+
+    document.getElementById('activeTxDate').addEventListener('change', function() {
+      const dt = parseDotDate(this.value);
+      if (dt) changeActiveDate(formatDotDate(dt));
+    });
+
+    document.getElementById('saveOpeningBtn').addEventListener('click', function() {
+      const d = state.activeDate;
+      state.manualOpenings[d] = {
+        prevDate: document.getElementById('openingDateInput').value.trim() || getPrevDotDate(d),
+        cash: parseFloat(document.getElementById('openingCashInput').value) || 0,
+        bank: parseFloat(document.getElementById('openingBankInput').value) || 0,
+        bkash: parseFloat(document.getElementById('openingBkashInput').value) || 0
+      };
+      saveState();
+      renderAll();
+      alert('পূর্বের ব্যালেন্স সংরক্ষিত হয়েছে।');
+    });
+
+    document.getElementById('lockDayBtn').addEventListener('click', function() {
+      const d = state.activeDate;
+      state.lockedDates[d] = !state.lockedDates[d];
+      saveState();
+      renderAll();
+    });
+
+    // Quick Transaction Submit
+    document.getElementById('quickTxForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const d = state.activeDate;
+      if (state.lockedDates[d]) {
+        alert('এই দিনটি লক করা আছে। আনলক করে এন্ট্রি দিন।');
+        return;
+      }
+
+      const acc = document.getElementById('txAccount').value; // Cash | Bank | Bkash
+      const voucher = document.getElementById('txVoucher').value.trim() || 'ME.NO-4599';
+      const purpose = document.getElementById('txPurpose').value;
+      let desc = document.getElementById('txDesc').value.trim();
+      if (purpose && purpose !== 'অন্যান্য' && !desc.toLowerCase().includes(purpose.toLowerCase())) {
+        desc = `For The Purpose Of ${purpose} (${desc})`;
+      }
+      const amt = parseFloat(document.getElementById('txAmount').value) || 0;
+      if (!desc || amt <= 0) return;
+
+      const row = {
+        id: 'row_' + Date.now(),
+        date: d,
+        voucher,
+        account: acc,
+        incSrc: '',
+        incCash: 0,
+        incBank: 0,
+        expSrc: '',
+        expAmt: 0
+      };
+
+      if (entryMode === 'income') {
+        row.incSrc = desc;
+        if (acc === 'Cash') row.incCash = amt;
+        else row.incBank = amt; // Bank or Bkash
+      } else if (entryMode === 'expense') {
+        row.expSrc = `[${acc}] ${desc}`;
+        row.expAmt = amt;
+      } else {
+        // Bank / Bkash transfer
+        if (acc === 'Bank' || acc === 'Bkash') {
+          row.incSrc = `${acc} ডিপোজিট: ${desc}`;
+          row.incBank = amt;
+          row.expSrc = `${acc} ডিপোজিট`;
+          row.expAmt = amt;
+        } else {
+          row.incSrc = `উত্তোলন: ${desc}`;
+          row.incCash = amt;
+        }
+      }
+
+      state.rows.push(row);
+      saveState();
+      document.getElementById('txDesc').value = '';
+      document.getElementById('txAmount').value = '';
+      document.getElementById('txPurpose').value = '';
+      document.getElementById('txVoucher').value = getNextVoucherSuggestion();
+      renderAll();
+    });
+
+    document.getElementById('addBlankRowBtn').addEventListener('click', function() {
+      if (state.lockedDates[state.activeDate]) return;
+      state.rows.push({
+        id: 'row_' + Date.now(),
+        date: state.activeDate,
+        voucher: '',
+        account: 'Cash',
+        incSrc: '', incCash: 0, incBank: 0, expSrc: '', expAmt: 0
+      });
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById('resetSampleBtn').addEventListener('click', function() {
+      if (!confirm('নমুনা ডেটায় ফিরে যেতে চান?')) return;
+      state = defaultState();
+      saveState();
+      document.getElementById('txVoucher').value = getNextVoucherSuggestion();
+      renderAll();
+    });
+
+    document.getElementById('searchInput').addEventListener('input', renderSheet);
+    document.getElementById('filterMode').addEventListener('change', renderSheet);
+
+    function deleteRow(id) {
+      if (state.lockedDates[state.activeDate]) {
+        alert('দিনটি লক করা আছে।');
+        return;
+      }
+      state.rows = state.rows.filter(r => r.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    function printSingleReceipt(id) {
+      const r = state.rows.find(x => x.id === id);
+      if (!r) return;
+      const amt = r.incCash || r.incBank || r.expAmt || 0;
+      const title = r.incSrc || r.expSrc || 'সাধারণ হিসাব';
+      const w = window.open('', '', 'width=480,height=440');
+      w.document.write(`
+        <html><head><title>Money Receipt</title>
+        <style>body{font-family:"SolaimanLipi",sans-serif;padding:24px;} .card{border:2px solid #000;padding:18px;border-radius:6px;} h3{text-align:center;margin-bottom:6px;} .row{display:flex;justify-content:space-between;margin:8px 0;border-bottom:1px dashed #999;padding-bottom:4px;}</style>
+        </head><body><div class="card"><h3>আইডিয়াল টেকনিক্যাল ট্রেনিং এন্ড টেস্টিং সেন্টার</h3><div style="text-align:center;font-size:12px;margin-bottom:14px;">মানি রিসিট / ক্যাশ ভাউচার</div>
+        <div class="row"><span>ভাউচার নং:</span><strong>${r.voucher || 'N/A'}</strong></div>
+        <div class="row"><span>তারিখ:</span><strong>${r.date}</strong></div>
+        <div class="row"><span>অ্যাকাউন্ট:</span><strong>${r.account || 'Cash'}</strong></div>
+        <div class="row"><span>বিবরণ:</span><strong>${title}</strong></div>
+        <div class="row"><span>পরিমাণ:</span><strong>৳ ${amt.toLocaleString('en-US')}</strong></div>
+        <div style="margin-top:38px;display:flex;justify-content:space-between;font-size:12px;"><span>গ্রহীতার স্বাক্ষর</span><span>কর্তৃপক্ষের স্বাক্ষর</span></div>
+        </div></body></html>
+      `);
+      w.document.close();
+      w.focus();
+      setTimeout(() => { w.print(); w.close(); }, 250);
+    }
+
+    function fmtCell(n) {
+      return n && Number(n) !== 0 ? Number(n).toLocaleString('en-US') : '';
+    }
+
+    function renderAll() {
+      const d = state.activeDate;
+      const dayName = getDayNameFromDot(d);
+      const sum = getDaySummary(d);
+
+      document.getElementById('activeTxDate').value = d;
+      document.getElementById('dayNameLabel').textContent = `${dayName} • Auto carry-forward`;
+      const slashDate = toBn(d.replace(/\./g, '/'));
+      document.getElementById('sheetSubBanner').textContent = `দৈনিক আয় ব্যয়ের হিসাব ${slashDate} (${dayName})`;
+
+      const isLocked = !!state.lockedDates[d];
+      const lockBtn = document.getElementById('lockDayBtn');
+      lockBtn.textContent = isLocked ? '🔒 Day Locked' : '🔓 Day Unlocked';
+      lockBtn.style.background = isLocked ? '#dc2626' : '';
+      lockBtn.style.color = isLocked ? '#ffffff' : '';
+
+      document.getElementById('openingDateInput').value = sum.opening.prevDate;
+      document.getElementById('openingCashInput').value = sum.opening.cash || 0;
+      document.getElementById('openingBankInput').value = sum.opening.bank || 0;
+      document.getElementById('openingBkashInput').value = sum.opening.bkash || 0;
+
+      document.getElementById('cardTotalCash').textContent = `৳${toBn(sum.totalCash)}`;
+      document.getElementById('subCashBreakdown').textContent = `পূর্বের: ৳${toBn(sum.opening.cash || 0)} + নতুন: ৳${toBn(sum.newCashIn)}`;
+      document.getElementById('cardTotalExpense').textContent = `৳${toBn(sum.totalExp)}`;
+      document.getElementById('cardTotalBank').textContent = `৳${toBn(sum.totalBank)}`;
+      document.getElementById('subBankBreakdown').textContent = `Bank ও Bkash ব্যালেন্স`;
+      document.getElementById('cardNetBalance').textContent = `৳${toBn(sum.cashBalance)} / ৳${toBn(sum.grandTotal)}`;
+
+      const openSumAll = (Number(sum.opening.cash) || 0) + (Number(sum.opening.bank) || 0) + (Number(sum.opening.bkash) || 0);
+      document.getElementById('txOpeningTotal').textContent = `৳ ${openSumAll.toLocaleString('en-US')}`;
+      document.getElementById('txOpeningSub').textContent = `Cash ৳${(sum.opening.cash||0).toLocaleString('en-US')} • Bank ৳${(sum.opening.bank||0).toLocaleString('en-US')} • Bkash ৳${(sum.opening.bkash||0).toLocaleString('en-US')}`;
+      document.getElementById('txTodayIn').textContent = `+৳ ${sum.newCashIn.toLocaleString('en-US')}`;
+      document.getElementById('txTodayCount').textContent = `${sum.dayRows.length} entries today`;
+      document.getElementById('txTodayExpense').textContent = `-৳ ${sum.totalExp.toLocaleString('en-US')}`;
+      document.getElementById('txBankNetSub').textContent = `Bank/Bkash জমা +৳${sum.newBankBkashIn.toLocaleString('en-US')}`;
+      document.getElementById('txClosingTotal').textContent = `৳ ${sum.grandTotal.toLocaleString('en-US')}`;
+      document.getElementById('txClosingCashSub').textContent = `হাতে নগদ ৳${sum.cashBalance.toLocaleString('en-US')}`;
+
+      const uniqueDates = [...new Set([d, ...state.rows.map(r => r.date)])].sort();
+      const pillBox = document.getElementById('datePillGroup');
+      pillBox.innerHTML = '';
+      uniqueDates.forEach(dtStr => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'date-pill' + (dtStr === d ? ' active' : '');
+        b.textContent = toBn(dtStr);
+        b.onclick = () => changeActiveDate(dtStr);
+        pillBox.appendChild(b);
+      });
+
+      renderDashboardAnalytics(sum, uniqueDates);
+      renderSheet();
+    }
+
+    function renderDashboardAnalytics(sum, uniqueDates) {
+      let weldingTotal = 0, fitterTotal = 0, visaTotal = 0, ppeTotal = 0;
+      let mdTotal = 0, dirTotal = 0, gmTotal = 0;
+      const mdItems = [], dirItems = [], gmItems = [];
+      const catMap = {};
+
+      sum.dayRows.forEach(r => {
+        const incText = (r.incSrc || '').toLowerCase();
+        const incVal = (Number(r.incCash) || 0) + (Number(r.incBank) || 0);
+        if (incText.includes('welding')) weldingTotal += incVal;
+        if (incText.includes('fitter')) fitterTotal += incVal;
+        if (incText.includes('visa')) visaTotal += incVal;
+        if (incText.includes('p.p.e') || incText.includes('ppe')) ppeTotal += incVal;
+
+        const expText = (r.expSrc || '').trim();
+        const expVal = Number(r.expAmt) || 0;
+        if (expVal > 0 && expText) {
+          catMap[expText] = (catMap[expText] || 0) + expVal;
+          const up = expText.toUpperCase();
+          if (up.includes('SABUJ')) {
+            mdTotal += expVal;
+            mdItems.push({ label: expText.replace(/SABUJ KAZI/i, '').trim() || 'খরচ', val: expVal });
+          } else if (up.includes('SOHEL')) {
+            dirTotal += expVal;
+            dirItems.push({ label: expText.replace(/SOHEL KAZI/i, '').trim() || 'খরচ', val: expVal });
+          } else if (up.includes('SALIM')) {
+            gmTotal += expVal;
+            gmItems.push({ label: expText.replace(/SALIM MAHMMUD/i, '').trim() || 'খরচ', val: expVal });
+          }
+        }
+      });
+
+      document.getElementById('weldingJobFeeVal').textContent = `৳${toBn(weldingTotal)}`;
+      document.getElementById('fitterFeeVal').textContent = `৳${toBn(fitterTotal)}`;
+      document.getElementById('visaFeeVal').textContent = `৳${toBn(visaTotal)}`;
+      document.getElementById('ppeFeeVal').textContent = `৳${toBn(ppeTotal)}`;
+
+      document.getElementById('mdTotalVal').textContent = `৳${toBn(mdTotal)}`;
+      document.getElementById('dirTotalVal').textContent = `৳${toBn(dirTotal)}`;
+      document.getElementById('gmTotalVal').textContent = `৳${toBn(gmTotal)}`;
+
+      renderMiniGraph('mdGraph', mdItems, 'var(--orange)');
+      renderMiniGraph('dirGraph', dirItems, '#60a5fa');
+      renderMiniGraph('gmGraph', gmItems, '#c084fc');
+
+      const barContainer = document.getElementById('expenseCategoryBars');
+      const entries = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      const maxCat = entries.length ? entries[0][1] : 1;
+      barContainer.innerHTML = entries.length ? entries.map(([k, v]) => `
+        <div class="h-bar-item">
+          <span class="h-bar-label" title="${k}">${k}</span>
+          <div class="h-bar-track"><div class="h-bar-fill" style="width:${Math.round((v / maxCat) * 100)}%"></div></div>
+          <strong>৳${toBn(v)}</strong>
+        </div>
+      `).join('') : '<div style="font-size:12px;color:var(--muted);">এই তারিখে কোনো ব্যয় নেই।</div>';
+
+      const sumBody = document.getElementById('dailyCategorySummaryBody');
+      sumBody.innerHTML = uniqueDates.map(dt => {
+        const rows = state.rows.filter(r => r.date === dt);
+        let w = 0, f = 0, vFee = 0, ppe = 0;
+        rows.forEach(r => {
+          const t = (r.incSrc || '').toLowerCase();
+          const v = (Number(r.incCash) || 0) + (Number(r.incBank) || 0);
+          if (t.includes('welding')) w += v;
+          if (t.includes('fitter')) f += v;
+          if (t.includes('visa')) vFee += v;
+          if (t.includes('p.p.e') || t.includes('ppe')) ppe += v;
+        });
+        return `<tr><td>${toBn(dt)}</td><td>৳${toBn(w)}</td><td>৳${toBn(f)}</td><td>৳${toBn(vFee)}</td><td>৳${toBn(ppe)}</td></tr>`;
+      }).join('');
+    }
+
+    function renderMiniGraph(elId, items, color) {
+      const box = document.getElementById(elId);
+      if (!items.length) {
+        box.innerHTML = `<div style="width:100%;text-align:center;font-size:11px;color:var(--muted);align-self:center;">কোনো এন্ট্রি নেই</div>`;
+        return;
+      }
+      const max = Math.max(...items.map(i => i.val), 1);
+      box.innerHTML = items.map(i => `
+        <div class="bar-col">
+          <span class="bar-val">৳${toBn(i.val)}</span>
+          <div class="bar-fill" style="height:${Math.max(12, Math.round((i.val / max) * 110))}px;background:${color};"></div>
+          <span class="bar-lbl" title="${i.label}">${i.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderSheet() {
+      const d = state.activeDate;
+      const sum = getDaySummary(d);
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filter = document.getElementById('filterMode').value;
+
+      const filteredRows = sum.dayRows.filter(r => {
+        if (filter === 'income' && !(r.incCash > 0 || r.incBank > 0 || r.incSrc)) return false;
+        if (filter === 'expense' && !(r.expAmt > 0 || r.expSrc)) return false;
+        if (!q) return true;
+        return (r.incSrc && r.incSrc.toLowerCase().includes(q)) ||
+               (r.expSrc && r.expSrc.toLowerCase().includes(q)) ||
+               (r.voucher && r.voucher.toLowerCase().includes(q));
+      });
+
+      const tbody = document.getElementById('ledgerBody');
+      tbody.innerHTML = '';
+
+      const openBankCombined = (Number(sum.opening.bank) || 0) + (Number(sum.opening.bkash) || 0);
+      const trOpen = document.createElement('tr');
+      trOpen.innerHTML = `
+        <td class="text-center bold">${sum.opening.prevDate}</td>
+        <td class="bold">পূর্বের ব্যালেন্স</td>
+        <td class="text-right bg-green">${fmtCell(sum.opening.cash)}</td>
+        <td class="text-right bg-yellow">${fmtCell(openBankCombined)}</td>
+        <td class="bold">পূর্বের ব্যালেন্স</td>
+        <td></td>
+        <td class="text-right bg-green">${fmtCell(sum.opening.cash)}</td>
+        <td></td>
+        <td class="text-right bg-yellow">${fmtCell(openBankCombined)}</td>
+        <td></td>
+        <td></td>
+        <td class="no-print text-center bold" style="font-size:10px;">Opening</td>
+      `;
+      tbody.appendChild(trOpen);
+
+      filteredRows.forEach(r => {
+        const incDisplay = `${r.voucher ? `[${r.voucher}] ` : ''}${r.incSrc || ''}${r.account ? ` (${r.account})` : ''}`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="text-center">${r.date}</td>
+          <td contenteditable="true" onblur="updateCell('${r.id}', 'incSrc', this.innerText)">${incDisplay}</td>
+          <td contenteditable="true" class="text-right" onblur="updateCell('${r.id}', 'incCash', this.innerText)">${fmtCell(r.incCash)}</td>
+          <td contenteditable="true" class="text-right ${r.incBank > 0 ? 'bg-green' : ''}" onblur="updateCell('${r.id}', 'incBank', this.innerText)">${fmtCell(r.incBank)}</td>
+          <td contenteditable="true" onblur="updateCell('${r.id}', 'expSrc', this.innerText)">${r.expSrc || ''}</td>
+          <td contenteditable="true" class="text-right" onblur="updateCell('${r.id}', 'expAmt', this.innerText)">${fmtCell(r.expAmt)}</td>
+          <td class="text-right">${fmtCell(r.incCash)}</td>
+          <td class="text-right">${fmtCell(r.expAmt)}</td>
+          <td class="text-right ${r.incBank > 0 ? 'bg-green' : ''}">${fmtCell(r.incBank)}</td>
+          <td></td>
+          <td></td>
+          <td class="no-print">
+            <div class="action-links">
+              <button type="button" class="link-receipt" onclick="printSingleReceipt('${r.id}')">রিসিট</button>
+              <button type="button" class="link-delete" onclick="deleteRow('${r.id}')">মুছুন</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const minRows = 16;
+      const blanks = Math.max(0, minRows - filteredRows.length);
+      for (let i = 0; i < blanks; i++) {
+        const trB = document.createElement('tr');
+        trB.innerHTML = `
+          <td class="text-center">${i < 4 ? d : ''}</td>
+          <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+          <td class="no-print"></td>
+        `;
+        tbody.appendChild(trB);
+      }
+
+      const tfoot = document.getElementById('ledgerFooter');
+      tfoot.innerHTML = `
+        <tr>
+          <td></td>
+          <td class="bold">ব্যাংকে/বিকাশে জমা আছে=</td>
+          <td></td>
+          <td></td>
+          <td class="text-right bold">ব্যাংকে/বিকাশে জমা আছে=</td>
+          <td></td><td></td><td></td><td></td><td></td><td></td>
+          <td class="no-print"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td class="text-right bg-green">${sum.totalCash.toLocaleString('en-US')}</td>
+          <td class="text-right bg-green">${sum.totalBank.toLocaleString('en-US')}</td>
+          <td class="text-right bold">ক্যাশে জমা আছে=</td>
+          <td class="text-right bg-yellow">${sum.totalExp.toLocaleString('en-US')}</td>
+          <td class="text-right bg-green">${sum.totalCash.toLocaleString('en-US')}</td>
+          <td class="text-right bg-yellow">${sum.totalExp.toLocaleString('en-US')}</td>
+          <td class="text-right bg-green">${sum.totalBank.toLocaleString('en-US')}</td>
+          <td class="text-right bg-green">${sum.cashBalance.toLocaleString('en-US')}</td>
+          <td class="text-right bg-green">${sum.grandTotal.toLocaleString('en-US')}</td>
+          <td class="no-print"></td>
+        </tr>
+      `;
+    }
+
+    function updateCell(id, field, rawVal) {
+      if (state.lockedDates[state.activeDate]) {
+        renderSheet();
+        return;
+      }
+      const idx = state.rows.findIndex(r => r.id === id);
+      if (idx === -1) return;
+      if (['incCash', 'incBank', 'expAmt'].includes(field)) {
+        const num = parseFloat(rawVal.replace(/,/g, '').trim()) || 0;
+        state.rows[idx][field] = num;
+      } else {
+        state.rows[idx][field] = rawVal.trim();
+      }
+      saveState();
+      renderAll();
+    }
+
+    // Print / PDF
+    function triggerPrintPdf() {
+      switchPane('sheetPane');
+      setTimeout(() => window.print(), 200);
+    }
+    document.getElementById('printPdfBtn').addEventListener('click', triggerPrintPdf);
+    document.getElementById('sheetPrintBtn').addEventListener('click', triggerPrintPdf);
+
+    // Backup & Restore
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      saveAs(blob, `ITTC_Accounts_Backup_${state.activeDate}.json`);
+    });
+
+    document.getElementById('importJsonBtn').addEventListener('click', () => {
+      document.getElementById('jsonFileInput').click();
+    });
+
+    document.getElementById('jsonFileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && Array.isArray(parsed.rows)) {
+            state = parsed;
+            saveState();
+            document.getElementById('txVoucher').value = getNextVoucherSuggestion();
+            renderAll();
+            alert('ব্যাকআপ সফলভাবে রিস্টোর হয়েছে!');
+          }
+        } catch (err) { alert('সঠিক ব্যাকআপ ফাইল নির্বাচন করুন।'); }
+      };
+      reader.readAsText(file);
+    });
+
+    // Styled Excel (.xlsx) Export
+    async function exportStyledExcel() {
+      const d = state.activeDate;
+      const dayName = getDayNameFromDot(d);
+      const sum = getDaySummary(d);
+      const slashDate = toBn(d.replace(/\./g, '/'));
+      const openBankCombined = (Number(sum.opening.bank) || 0) + (Number(sum.opening.bkash) || 0);
+
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet('দৈনিক হিসাব', {
+        pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1 }
+      });
+
+      ws.columns = [
+        { width: 13 }, { width: 36 }, { width: 13 }, { width: 14 },
+        { width: 34 }, { width: 13 }, { width: 13 }, { width: 13 },
+        { width: 14 }, { width: 14 }, { width: 15 }
+      ];
+
+      const border = {
+        top: { style: 'thin', color: { argb: 'FF000000' } },
+        left: { style: 'thin', color: { argb: 'FF000000' } },
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+        right: { style: 'thin', color: { argb: 'FF000000' } }
+      };
+
+      const greenFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00B050' } };
+      const yellowFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
+      const peachFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4B084' } };
+
+      ws.mergeCells('A1:K1');
+      ws.getCell('A1').value = 'আইডিয়াল টেকনিক্যাল ট্রেনিং এন্ড টেস্টিং সেন্টার';
+      ws.getCell('A1').fill = greenFill;
+      ws.getCell('A1').font = { size: 16, bold: true, color: { argb: 'FF000000' } };
+      ws.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+      ws.getRow(1).height = 28;
+
+      ws.mergeCells('A2:K2');
+      ws.getCell('A2').value = `দৈনিক আয় ব্যয়ের হিসাব ${slashDate} (${dayName})`;
+      ws.getCell('A2').fill = yellowFill;
+      ws.getCell('A2').font = { size: 13, bold: true, color: { argb: 'FF000000' } };
+      ws.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+      ws.getRow(2).height = 22;
+
+      ws.mergeCells('A3:A4'); ws.getCell('A3').value = 'তারিখ';
+      ws.mergeCells('B3:D3'); ws.getCell('B3').value = 'আয়';
+      ws.mergeCells('E3:F3'); ws.getCell('E3').value = 'ব্যয়';
+      ws.mergeCells('G3:G4'); ws.getCell('G3').value = 'নগদ টাকা';
+      ws.mergeCells('H3:H4'); ws.getCell('H3').value = 'ব্যয়ের টাকা';
+      ws.mergeCells('I3:I4'); ws.getCell('I3').value = 'ব্যাংক/বিকাশ';
+      ws.mergeCells('J3:J4'); ws.getCell('J3').value = 'নগদ ব্যালেন্স';
+      ws.mergeCells('K3:K4'); ws.getCell('K3').value = 'নগদ + ব্যাংক';
+
+      ws.getCell('B4').value = 'আয়ের মাধ্যম / ভাউচার';
+      ws.getCell('C4').value = 'নগদ টাকা';
+      ws.getCell('D4').value = 'ব্যাংক/বিকাশ';
+      ws.getCell('E4').value = 'ব্যয়ের মাধ্যম';
+      ws.getCell('F4').value = 'ব্যয়ের টাকা';
+
+      [3, 4].forEach(r => {
+        ws.getRow(r).height = 20;
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws.getRow(r).getCell(c);
+          cell.fill = peachFill;
+          cell.font = { size: 11, bold: true };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = border;
+        }
+      });
+
+      const r5 = ws.getRow(5);
+      r5.height = 20;
+      r5.values = [
+        sum.opening.prevDate, 'পূর্বের ব্যালেন্স', sum.opening.cash || null, openBankCombined || null,
+        'পূর্বের ব্যালেন্স', null, sum.opening.cash || null, null, openBankCombined || null, null, null
+      ];
+      for (let c = 1; c <= 11; c++) {
+        const cell = r5.getCell(c);
+        cell.font = { size: 11, bold: true };
+        cell.border = border;
+        if (c === 1) cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        else if ([3, 4, 7, 9].includes(c)) {
+          cell.alignment = { horizontal: 'right', vertical: 'middle' };
+          cell.numFmt = '#,##0';
+        }
+      }
+      r5.getCell(3).fill = greenFill;
+      r5.getCell(4).fill = yellowFill;
+      r5.getCell(7).fill = greenFill;
+      r5.getCell(9).fill = yellowFill;
+
+      let idx = 6;
+      sum.dayRows.forEach(r => {
+        const incDisplay = `${r.voucher ? `[${r.voucher}] ` : ''}${r.incSrc || ''}${r.account ? ` (${r.account})` : ''}`;
+        const row = ws.getRow(idx);
+        row.height = 19;
+        row.values = [
+          r.date, incDisplay, r.incCash || null, r.incBank || null,
+          r.expSrc || '', r.expAmt || null, r.incCash || null, r.expAmt || null, r.incBank || null, null, null
+        ];
+        for (let c = 1; c <= 11; c++) {
+          const cell = row.getCell(c);
+          cell.font = { size: 10.5 };
+          cell.border = border;
+          if (c === 1) cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          else if ([3, 4, 6, 7, 8, 9].includes(c)) {
+            cell.alignment = { horizontal: 'right', vertical: 'middle' };
+            cell.numFmt = '#,##0';
+          }
+        }
+        if (r.incBank > 0) {
+          row.getCell(4).fill = greenFill;
+          row.getCell(9).fill = greenFill;
+        }
+        idx++;
+      });
+
+      const lastPad = Math.max(idx + 4, 30);
+      while (idx <= lastPad) {
+        const row = ws.getRow(idx);
+        row.height = 18;
+        for (let c = 1; c <= 11; c++) row.getCell(c).border = border;
+        idx++;
+      }
+
+      const bankRowIdx = idx;
+      const rB = ws.getRow(bankRowIdx);
+      rB.height = 20;
+      rB.getCell(2).value = 'ব্যাংকে/বিকাশে জমা আছে=';
+      rB.getCell(5).value = 'ব্যাংকে/বিকাশে জমা আছে=';
+      rB.getCell(5).alignment = { horizontal: 'right', vertical: 'middle' };
+      for (let c = 1; c <= 11; c++) {
+        rB.getCell(c).font = { size: 11, bold: true };
+        rB.getCell(c).border = border;
+      }
+
+      const totIdx = bankRowIdx + 1;
+      const lastData = bankRowIdx - 1;
+      const rT = ws.getRow(totIdx);
+      rT.height = 22;
+
+      rT.getCell(3).value = { formula: `SUM(C5:C${lastData})` };
+      rT.getCell(4).value = { formula: `SUM(D5:D${lastData})` };
+      rT.getCell(5).value = 'ক্যাশে জমা আছে=';
+      rT.getCell(5).alignment = { horizontal: 'right', vertical: 'middle' };
+      rT.getCell(6).value = { formula: `SUM(F6:F${lastData})` };
+      rT.getCell(7).value = { formula: `SUM(G5:G${lastData})` };
+      rT.getCell(8).value = { formula: `SUM(H6:H${lastData})` };
+      rT.getCell(9).value = { formula: `SUM(I5:I${lastData})` };
+      rT.getCell(10).value = { formula: `G${totIdx}-H${totIdx}` };
+      rT.getCell(11).value = { formula: `J${totIdx}+I${totIdx}` };
+
+      for (let c = 1; c <= 11; c++) {
+        const cell = rT.getCell(c);
+        cell.font = { size: 11, bold: true };
+        cell.border = border;
+        if ([3, 4, 6, 7, 8, 9, 10, 11].includes(c)) {
+          cell.alignment = { horizontal: 'right', vertical: 'middle' };
+          cell.numFmt = '#,##0';
+        }
+      }
+      [3, 4, 7, 9, 10, 11].forEach(c => { rT.getCell(c).fill = greenFill; });
+      [6, 8].forEach(c => { rT.getCell(c).fill = yellowFill; });
+
+      const buf = await wb.xlsx.writeBuffer();
+      saveAs(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `ITTC_Accounts_${d}.xlsx`);
+    }
+
+    document.getElementById('exportXlsxBtn').addEventListener('click', exportStyledExcel);
+    document.getElementById('topExportXlsxBtn').addEventListener('click', exportStyledExcel);
+
+    loadState();
+  </script>
+</body>
+</html>
